@@ -774,7 +774,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
         toast.success("连接已添加");
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "保存失败");
+      toast.error(error instanceof Error ? error.message : "Lưu thất bại");
     } finally {
       set({ isSavingPool: false });
     }

@@ -26,7 +26,7 @@ export function ProxySettingsCard() {
   const handleTest = async () => {
     const candidate = proxy.trim();
     if (!candidate) {
-      toast.error("请先填写代理地址");
+      toast.error("Vui lòng nhập địa chỉ proxy");
       return;
     }
     setIsTesting(true);
@@ -35,12 +35,12 @@ export function ProxySettingsCard() {
       const data = await testProxy(candidate);
       setTestResult(data.result);
       if (data.result.ok) {
-        toast.success(`代理可用（${data.result.latency_ms} ms，HTTP ${data.result.status}）`);
+        toast.success(`Proxy hoạt động tốt (${data.result.latency_ms} ms, HTTP ${data.result.status})`);
       } else {
-        toast.error(`代理不可用：${data.result.error ?? "未知错误"}`);
+        toast.error(`Proxy không khả dụng: ${data.result.error ?? "Lỗi không xác định"}`);
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "测试代理失败");
+      toast.error(error instanceof Error ? error.message : "Kiểm tra proxy thất bại");
     } finally {
       setIsTesting(false);
     }
@@ -71,7 +71,7 @@ export function ProxySettingsCard() {
         ) : (
           <>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-stone-700">代理地址</label>
+              <label className="text-sm font-medium text-stone-700">Địa chỉ Proxy</label>
               <Input
                 value={proxy}
                 onChange={(event) => {

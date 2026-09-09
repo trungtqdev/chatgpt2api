@@ -6,14 +6,14 @@ services:
     image: chatgpt2api:local
     container_name: chatgpt2api-local
     ports:
-      - "8000:80"
+      - "127.0.0.1:3300:80"
     volumes:
       - ./data:/app/data
       - ./config.json:/app/config.json
     environment:
       STORAGE_BACKEND: sqlite
       DATABASE_URL: sqlite:////app/data/accounts.db
-    # 存储后端配置 (可选值: json, sqlite, postgres, git)
+    # Cấu hình lưu trữ (tùy chọn: json, sqlite, postgres, git)
     # environment:
     #   STORAGE_BACKEND: json
 

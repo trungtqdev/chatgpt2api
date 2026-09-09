@@ -37,7 +37,7 @@ export function ConfigCard() {
   const handleTestProxy = async () => {
     const candidate = String(config?.proxy || "").trim();
     if (!candidate) {
-      toast.error("请先填写代理地址");
+      toast.error("Vui lòng nhập địa chỉ proxy");
       return;
     }
     setIsTestingProxy(true);
@@ -46,12 +46,12 @@ export function ConfigCard() {
       const data = await testProxy(candidate);
       setProxyTestResult(data.result);
       if (data.result.ok) {
-        toast.success(`代理可用（${data.result.latency_ms} ms，HTTP ${data.result.status}）`);
+        toast.success(`Proxy hoạt động tốt (${data.result.latency_ms} ms, HTTP ${data.result.status})`);
       } else {
-        toast.error(`代理不可用：${data.result.error ?? "未知错误"}`);
+        toast.error(`Proxy không khả dụng: ${data.result.error ?? "Lỗi không xác định"}`);
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "测试代理失败");
+      toast.error(error instanceof Error ? error.message : "Kiểm tra proxy thất bại");
     } finally {
       setIsTestingProxy(false);
     }
@@ -204,14 +204,14 @@ export function ConfigCard() {
             <p className="text-xs text-stone-500">每次请求都会作为 system 消息注入，可用于审核用户提示词、避免违规内容、统一约束模型行为或固定角色设定。</p>
           </div>
           <div className="space-y-2 md:col-span-2">
-            <label className="text-sm text-stone-700">敏感词</label>
+            <label className="text-sm text-stone-700">Từ khóa nhạy cảm</label>
             <Textarea
               value={(config?.sensitive_words || []).join("\n")}
               onChange={(event) => setSensitiveWordsText(event.target.value)}
-              placeholder="一行一个，命中即拒绝"
+              placeholder="Mỗi dòng một từ khóa, khớp sẽ từ chối"
               className="min-h-28 rounded-xl border-stone-200 bg-white font-mono text-xs shadow-none"
             />
-            <p className="text-xs text-stone-500">只要用户请求包含任意敏感词，就直接返回拒绝。</p>
+            <p className="text-xs text-stone-500">Nếu yêu cầu của người dùng chứa bất kỳ từ khóa nào trong danh sách, hệ thống sẽ từ chối.</p>
           </div>
           <div className="space-y-4 rounded-xl border border-stone-200 bg-white px-4 py-3 md:col-span-2">
             <label className="flex items-center gap-3 text-sm text-stone-700">
@@ -219,10 +219,10 @@ export function ConfigCard() {
                 checked={Boolean(config?.ai_review?.enabled)}
                 onCheckedChange={(checked) => setAIReviewField("enabled", Boolean(checked))}
               />
-              启用 AI 审核
+              Kích hoạt AI kiểm duyệt
             </label>
             <p className="text-xs leading-6 text-stone-500">
-              开启后会在请求进入生图账号前先调用审核模型，审核不通过会直接拒绝，减少违规提示词触达账号造成风控或封号的风险。
+              Kích hoạt sẽ gọi mô hình kiểm duyệt trước khi gửi yêu cầu tới tài khoản vẽ tranh, giúp giảm thiểu rủi ro bị khóa tài khoản.
             </p>
             <div className="grid gap-4 md:grid-cols-3">
               <div className="space-y-2">
@@ -239,7 +239,7 @@ export function ConfigCard() {
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-sm text-stone-700">审核提示词</label>
+              <label className="text-sm text-stone-700">Câu lệnh kiểm duyệt</label>
               <Textarea value={String(config?.ai_review?.prompt || "")} onChange={(event) => setAIReviewField("prompt", event.target.value)} placeholder="判断用户请求是否允许。只回答 ALLOW 或 REJECT。" className="min-h-24 rounded-xl border-stone-200 bg-white text-xs shadow-none" />
             </div>
           </div>

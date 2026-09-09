@@ -66,7 +66,7 @@ export function RegisterCard() {
                 <UserPlus className="size-5 text-stone-600" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold tracking-tight">注册配置</h2>
+                <h2 className="text-lg font-semibold tracking-tight">Cấu hình đăng ký</h2>
               </div>
             </div>
             <Button className="h-9 rounded-xl bg-stone-950 px-4 text-white hover:bg-stone-800" onClick={() => void save()} disabled={isSaving || config.enabled}>
@@ -77,40 +77,40 @@ export function RegisterCard() {
 
           <div className="grid gap-4 md:grid-cols-3">
             <div className="space-y-2">
-              <label className="text-sm text-stone-700">注册模式</label>
+              <label className="text-sm text-stone-700">Chế độ đăng ký</label>
               <Select value={config.mode || "total"} onValueChange={(value) => setMode(value as "total" | "quota" | "available")} disabled={config.enabled}>
                 <SelectTrigger className="h-10 rounded-xl border-stone-200 bg-white">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="total">注册总数</SelectItem>
-                  <SelectItem value="quota">号池剩余额度</SelectItem>
-                  <SelectItem value="available">可用账号数量</SelectItem>
+                  <SelectItem value="total">Tổng số lượng đăng ký</SelectItem>
+                  <SelectItem value="quota">Hạn mức còn lại của nhóm</SelectItem>
+                  <SelectItem value="available">Số lượng tài khoản khả dụng</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm text-stone-700">注册总数</label>
+              <label className="text-sm text-stone-700">Tổng số lượng đăng ký</label>
               <Input value={String(config.total)} onChange={(event) => setTotal(event.target.value)} className="h-10 rounded-xl border-stone-200 bg-white" disabled={config.enabled || config.mode !== "total"} />
             </div>
             <div className="space-y-2">
-              <label className="text-sm text-stone-700">线程数</label>
+              <label className="text-sm text-stone-700">Số luồng (Threads)</label>
               <Input value={String(config.threads)} onChange={(event) => setThreads(event.target.value)} className="h-10 rounded-xl border-stone-200 bg-white" disabled={config.enabled} />
             </div>
             <div className="space-y-2">
-              <label className="text-sm text-stone-700">注册代理</label>
+              <label className="text-sm text-stone-700">Proxy đăng ký</label>
               <Input value={config.proxy} onChange={(event) => setProxy(event.target.value)} placeholder="http://127.0.0.1:7890" className="h-10 rounded-xl border-stone-200 bg-white" disabled={config.enabled} />
             </div>
             <div className="space-y-2">
-              <label className="text-sm text-stone-700">目标剩余额度</label>
+              <label className="text-sm text-stone-700">Hạn mức mục tiêu</label>
               <Input value={String(config.target_quota || "")} onChange={(event) => setTargetQuota(event.target.value)} className="h-10 rounded-xl border-stone-200 bg-white" disabled={config.enabled || config.mode !== "quota"} />
             </div>
             <div className="space-y-2">
-              <label className="text-sm text-stone-700">目标可用账号</label>
+              <label className="text-sm text-stone-700">Số tài khoản mục tiêu</label>
               <Input value={String(config.target_available || "")} onChange={(event) => setTargetAvailable(event.target.value)} className="h-10 rounded-xl border-stone-200 bg-white" disabled={config.enabled || config.mode !== "available"} />
             </div>
             <div className="space-y-2">
-              <label className="text-sm text-stone-700">检查间隔（秒）</label>
+              <label className="text-sm text-stone-700">Khoảng thời gian kiểm tra (giây)</label>
               <Input value={String(config.check_interval || "")} onChange={(event) => setCheckInterval(event.target.value)} className="h-10 rounded-xl border-stone-200 bg-white" disabled={config.enabled || config.mode === "total"} />
             </div>
           </div>
@@ -118,8 +118,8 @@ export function RegisterCard() {
           <div className="space-y-3 border-t border-stone-200 pt-3">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <h3 className="text-sm font-semibold text-stone-800">邮箱配置</h3>
-                <p className="mt-1 text-xs text-stone-500">可配置多个 provider，按启用顺序轮换。</p>
+                <h3 className="text-sm font-semibold text-stone-800">Cấu hình hộp thư (Email)</h3>
+                <p className="mt-1 text-xs text-stone-500">Có thể cấu hình nhiều nhà cung cấp, luân phiên theo thứ tự.</p>
               </div>
               <Button type="button" variant="outline" className="h-9 rounded-xl border-stone-200 bg-white px-3 text-stone-700" onClick={addProvider} disabled={config.enabled}>
                 <Plus className="size-4" />
@@ -129,15 +129,15 @@ export function RegisterCard() {
 
             <div className="grid gap-4 md:grid-cols-3">
               <div className="space-y-2">
-                <label className="text-sm text-stone-700">请求超时</label>
+                <label className="text-sm text-stone-700">Thời gian chờ yêu cầu</label>
                 <Input value={String(config.mail.request_timeout || "")} onChange={(event) => setMailField("request_timeout", event.target.value)} className="h-10 rounded-xl border-stone-200 bg-white" disabled={config.enabled} />
               </div>
               <div className="space-y-2">
-                <label className="text-sm text-stone-700">等待验证码超时</label>
+                <label className="text-sm text-stone-700">Thời gian chờ mã OTP</label>
                 <Input value={String(config.mail.wait_timeout || "")} onChange={(event) => setMailField("wait_timeout", event.target.value)} className="h-10 rounded-xl border-stone-200 bg-white" disabled={config.enabled} />
               </div>
               <div className="space-y-2">
-                <label className="text-sm text-stone-700">轮询间隔</label>
+                <label className="text-sm text-stone-700">Khoảng thời gian kiểm tra</label>
                 <Input value={String(config.mail.wait_interval || "")} onChange={(event) => setMailField("wait_interval", event.target.value)} className="h-10 rounded-xl border-stone-200 bg-white" disabled={config.enabled} />
               </div>
             </div>
@@ -160,7 +160,7 @@ export function RegisterCard() {
 
                     <div className="grid gap-4 md:grid-cols-2">
                       <div className="space-y-2">
-                        <label className="text-sm text-stone-700">类型</label>
+                        <label className="text-sm text-stone-700">Loại</label>
                         <Select value={type} onValueChange={(value) => updateProviderType(index, value)} disabled={config.enabled}>
                           <SelectTrigger className="h-10 rounded-xl border-stone-200 bg-white">
                             <SelectValue />
@@ -171,7 +171,7 @@ export function RegisterCard() {
                             <SelectItem value="moemail">moemail</SelectItem>
                             <SelectItem value="inbucket">inbucket_mail</SelectItem>
                             <SelectItem value="duckmail">duckmail</SelectItem>
-                            <SelectItem value="gptmail">gptmail(未测试)</SelectItem>
+                            <SelectItem value="gptmail">gptmail (Chưa thử nghiệm)</SelectItem>
                             <SelectItem value="yyds_mail">yyds_mail</SelectItem>
                           </SelectContent>
                         </Select>
@@ -224,8 +224,8 @@ export function RegisterCard() {
 
                     {type === "tempmail_lol" || type === "cloudflare_temp_email" || type === "moemail" || type === "inbucket" || type === "yyds_mail" ? (
                       <div className="space-y-2">
-                        <label className="text-sm text-stone-700">{type === "inbucket" ? "基础域名列表" : "Domain"}</label>
-                        <Textarea value={domains} onChange={(event) => updateProvider(index, { domain: event.target.value.split(/[\n,]/).map((item) => item.trim()).filter(Boolean) })} placeholder={type === "inbucket" ? "每行一个基础域名，系统会自动生成随机子域名" : type === "moemail" ? "每行一个域名" : "每行一个域名，留空则使用服务默认域名"} className="min-h-20 rounded-xl border-stone-200 bg-white font-mono text-xs" disabled={config.enabled} />
+                        <label className="text-sm text-stone-700">{type === "inbucket" ? "Danh sách tên miền cơ sở" : "Domain"}</label>
+                        <Textarea value={domains} onChange={(event) => updateProvider(index, { domain: event.target.value.split(/[\n,]/).map((item) => item.trim()).filter(Boolean) })} placeholder={type === "inbucket" ? "Mỗi dòng một tên miền cơ sở, hệ thống sẽ tự động tạo subdomain ngẫu nhiên" : type === "moemail" ? "每行一个域名" : "Mỗi dòng một tên miền, để trống để dùng mặc định"} className="min-h-20 rounded-xl border-stone-200 bg-white font-mono text-xs" disabled={config.enabled} />
                       </div>
                     ) : null}
                   </div>
@@ -240,23 +240,23 @@ export function RegisterCard() {
         <div className="space-y-3">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h2 className="text-lg font-semibold tracking-tight">运行结果</h2>
-                <p className="mt-1 text-sm text-stone-500">SSE 实时推送当前状态。</p>
+                <h2 className="text-lg font-semibold tracking-tight">Kết quả thực thi</h2>
+                <p className="mt-1 text-sm text-stone-500">Cập nhật trạng thái thời gian thực qua SSE.</p>
               </div>
               <Badge variant={config.enabled ? "success" : "secondary"} className="rounded-md">
-                {config.enabled ? "运行中" : "已停止"}
+                {config.enabled ? "Đang chạy" : "Đã dừng"}
               </Badge>
             </div>
             <div className="grid grid-cols-4 gap-2">
               {[
-                ["成功 / 成功率", `${stats.success} / ${stats.success_rate || 0}%`],
-                ["失败", stats.fail],
-                ["完成", stats.done],
-                ["运行 / 线程", `${stats.running} / ${stats.threads}`],
-                ["运行时间", `${stats.elapsed_seconds || 0}s`],
-                ["平均注册单个", `${stats.avg_seconds || 0}s`],
-                ["当前额度", stats.current_quota || 0],
-                ["正常账号", stats.current_available || 0],
+                ["Thành công / Tỷ lệ", `${stats.success} / ${stats.success_rate || 0}%`],
+                ["Thất bại", stats.fail],
+                ["Hoàn thành", stats.done],
+                ["Đang chạy / Luồng", `${stats.running} / ${stats.threads}`],
+                ["Thời gian chạy", `${stats.elapsed_seconds || 0}s`],
+                ["Thời gian TB / tài khoản", `${stats.avg_seconds || 0}s`],
+                ["Hạn mức hiện tại", stats.current_quota || 0],
+                ["Tài khoản hoạt động", stats.current_available || 0],
               ].map(([label, value]) => (
                 <div key={label} className="border border-stone-200 bg-white/70 px-3 py-2">
                   <div className="text-xs text-stone-400">{label}</div>
@@ -267,7 +267,7 @@ export function RegisterCard() {
             <div className="grid grid-cols-3 gap-2">
               <Button className="h-10 rounded-xl bg-stone-950 px-3 text-white hover:bg-stone-800" onClick={() => void toggle()} disabled={isSaving}>
                 {isSaving ? <LoaderCircle className="size-4 animate-spin" /> : config.enabled ? <Square className="size-4" /> : <Play className="size-4" />}
-                {config.enabled ? "停止" : "启动"}
+                {config.enabled ? "Dừng" : "Bắt đầu"}
               </Button>
               <Button variant="outline" className="h-10 rounded-xl border-stone-200 bg-white px-3 text-stone-700" onClick={() => void reset()} disabled={isSaving || config.enabled}>
                 <RotateCcw className="size-4" />
@@ -280,15 +280,15 @@ export function RegisterCard() {
             </div>
             <div className="flex items-center gap-2 border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
               <AlertTriangle className="size-4 shrink-0" />
-              启动之前注意先保存配置。
+              Lưu ý lưu cấu hình trước khi khởi động.
             </div>
         </div>
 
         <div className="mt-4 flex min-h-0 flex-1 flex-col space-y-3 overflow-hidden border-t border-stone-200 pt-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-semibold text-stone-900">实时日志</h3>
-                <p className="mt-1 text-xs text-amber-700">遇到 HTTP 状态码 400 等错误，基本是邮箱滥用被封，需要更换新的域名邮箱。</p>
+                <h3 className="text-sm font-semibold text-stone-900">Nhật ký thời gian thực</h3>
+                <p className="mt-1 text-xs text-amber-700">Nếu gặp lỗi HTTP 400, đa phần do tên miền email bị chặn, cần đổi sang tên miền email mới.</p>
               </div>
               <Badge variant="secondary" className="rounded-md">
                 {logs.length}
@@ -296,7 +296,7 @@ export function RegisterCard() {
             </div>
             <div className="min-h-0 flex-1 overflow-y-auto border border-stone-200 bg-white/70 p-3 font-mono text-xs leading-6">
               {logs.length === 0 ? (
-                <div className="text-stone-500">暂无日志</div>
+                <div className="text-stone-500">Chưa có nhật ký</div>
               ) : (
                 logs.slice().reverse().map((item, index) => (
                   <div key={`${item.time}-${index}`} className={item.level === "red" ? "text-rose-600" : item.level === "green" ? "text-emerald-700" : item.level === "yellow" ? "text-amber-700" : "text-stone-700"}>

@@ -4,8 +4,8 @@ import "./globals.css";
 import { TopNav } from "@/components/top-nav";
 
 export const metadata: Metadata = {
-  title: "ChatGPT 号池管理",
-  description: "ChatGPT account pool management dashboard",
+  title: "ChatGPT2API - Quản lý & Tạo ảnh",
+  description: "Bảng điều khiển quản lý tài khoản và API tạo ảnh ChatGPT",
 };
 
 export const viewport: Viewport = {
@@ -22,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN" suppressHydrationWarning>
+    <html lang="vi" suppressHydrationWarning>
       <body
         className="antialiased"
         style={{

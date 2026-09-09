@@ -23,8 +23,8 @@ const LogType = {
 } as const;
 
 const typeLabels: Record<string, string> = {
-  [LogType.Call]: "调用日志",
-  [LogType.Account]: "账号管理日志",
+  [LogType.Call]: "Nhật ký gọi API",
+  [LogType.Account]: "Nhật ký quản lý tài khoản",
 };
 
 function getDetailText(item: SystemLog, key: string) {
@@ -44,8 +44,8 @@ function getUrls(item: SystemLog | null) {
 
 function getStatus(item: SystemLog) {
   const status = item.detail?.status;
-  if (status === "success") return "成功";
-  if (status === "failed") return "失败";
+  if (status === "success") return "Thành công";
+  if (status === "failed") return "Thất bại";
   return "-";
 }
 
@@ -82,7 +82,7 @@ function LogsContent() {
       setSelectedIds((current) => current.filter((id) => data.items.some((item) => item.id === id)));
       setPage(1);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "加载日志失败");
+      toast.error(error instanceof Error ? error.message : "Tải nhật ký thất bại");
     } finally {
       setIsLoading(false);
     }
@@ -114,7 +114,7 @@ function LogsContent() {
     setIsDeleting(true);
     try {
       const data = await deleteSystemLogs(ids);
-      toast.success(`已删除 ${data.removed} 条日志`);
+      toast.success(`Đã xóa ${data.removed} bản ghi nhật ký`);
       setDeletingItems([]);
       setSelectedIds((current) => current.filter((id) => !ids.includes(id)));
       if (detailLog && ids.includes(detailLog.id)) {
@@ -123,7 +123,7 @@ function LogsContent() {
       }
       await loadLogs();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "删除日志失败");
+      toast.error(error instanceof Error ? error.message : "Xóa nhật ký thất bại");
     } finally {
       setIsDeleting(false);
     }
@@ -138,14 +138,14 @@ function LogsContent() {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="space-y-1">
           <div className="text-xs font-semibold tracking-[0.18em] text-stone-500 uppercase">Logs</div>
-          <h1 className="text-2xl font-semibold tracking-tight">日志管理</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Nhật ký hệ thống</h1>
         </div>
         <div className="flex flex-wrap gap-2">
           <Select value={type} onValueChange={setType}>
             <SelectTrigger className="h-10 w-[150px] rounded-xl border-stone-200 bg-white"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value={LogType.Call}>调用日志</SelectItem>
-              <SelectItem value={LogType.Account}>账号管理日志</SelectItem>
+              <SelectItem value={LogType.Call}>Nhật ký gọi API</SelectItem>
+              <SelectItem value={LogType.Account}>Nhật ký quản lý tài khoản</SelectItem>
             </SelectContent>
           </Select>
           <DateRangeFilter startDate={startDate} endDate={endDate} onChange={(start, end) => { setStartDate(start); setEndDate(end); }} />
@@ -163,7 +163,7 @@ function LogsContent() {
         <CardContent className="p-0">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-100 px-5 py-4">
             <div className="flex flex-wrap items-center gap-3 text-sm text-stone-600">
-              <span>共 {items.length} 条</span>
+              <span>Tổng cộng {items.length} mục</span>
               <label className="flex items-center gap-2">
                 <Checkbox checked={currentPageSelected} onCheckedChange={(checked) => toggleIds(currentRows.map((item) => item.id), Boolean(checked))} />
                 本页全选
@@ -172,7 +172,7 @@ function LogsContent() {
                 <Checkbox checked={allSelected} onCheckedChange={(checked) => toggleIds(items.map((item) => item.id), Boolean(checked))} />
                 全选结果
               </label>
-              {selectedIds.length > 0 ? <span>已选 {selectedIds.length} 条</span> : null}
+              {selectedIds.length > 0 ? <span>Đã chọn {selectedIds.length} mục</span> : null}
             </div>
             <div className="flex items-center gap-2">
               <Button variant="ghost" className="h-8 rounded-lg px-3 text-stone-500" onClick={() => void loadLogs()} disabled={isLoading}>
@@ -193,14 +193,14 @@ function LogsContent() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-12"></TableHead>
-                  <TableHead>时间</TableHead>
-                  <TableHead>类型</TableHead>
-                  {isCallLog ? <TableHead>令牌名称</TableHead> : null}
-                  {isCallLog ? <TableHead>调用耗时</TableHead> : null}
-                  {isCallLog ? <TableHead>状态</TableHead> : null}
-                  {isCallLog ? <TableHead className="w-36">图片</TableHead> : null}
-                  <TableHead>简述</TableHead>
-                  <TableHead className="w-40">操作</TableHead>
+                  <TableHead>Thời gian</TableHead>
+                  <TableHead>Loại</TableHead>
+                  {isCallLog ? <TableHead>Tên Token</TableHead> : null}
+                  {isCallLog ? <TableHead>Thời gian gọi</TableHead> : null}
+                  {isCallLog ? <TableHead>Trạng thái</TableHead> : null}
+                  {isCallLog ? <TableHead className="w-36">Hình ảnh</TableHead> : null}
+                  <TableHead>Mô tả</TableHead>
+                  <TableHead className="w-40">Thao tác</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -232,7 +232,7 @@ function LogsContent() {
                                   type="button"
                                   className="relative size-9 overflow-hidden rounded-lg border border-stone-200 bg-stone-100"
                                   onClick={() => openLogImage(item, imageIndex)}
-                                  title="预览图片"
+                                  title="Xem trước ảnh"
                                 >
                                   <ImageThumbnail src={url} thumbnailSrc={getImageThumbnailUrl(url)} className="h-full w-full" />
                                 </button>
@@ -265,7 +265,7 @@ function LogsContent() {
             </Table>
           </div>
           <div className="flex items-center justify-end gap-2 border-t border-stone-100 px-4 py-3 text-sm text-stone-500">
-            <span>第 {safePage} / {pageCount} 页，共 {items.length} 条</span>
+            <span>第 {safePage} / {pageCount} 页，Tổng cộng {items.length} mục</span>
             <Button variant="outline" size="icon" className="size-9 rounded-lg border-stone-200 bg-white" disabled={safePage <= 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>
               <ChevronLeft className="size-4" />
             </Button>
@@ -273,13 +273,13 @@ function LogsContent() {
               <ChevronRight className="size-4" />
             </Button>
           </div>
-          {!isLoading && items.length === 0 ? <div className="px-6 py-14 text-center text-sm text-stone-500">没有找到日志</div> : null}
+          {!isLoading && items.length === 0 ? <div className="px-6 py-14 text-center text-sm text-stone-500">Không tìm thấy bản ghi nhật ký nào</div> : null}
         </CardContent>
       </Card>
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
         <DialogContent className="flex h-[min(88vh,860px)] w-[min(92vw,920px)] flex-col overflow-hidden rounded-2xl p-0">
           <DialogHeader className="shrink-0 border-b border-stone-100 px-6 py-5">
-            <DialogTitle>日志详情</DialogTitle>
+            <DialogTitle>Chi tiết nhật ký</DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-y-auto px-6 py-5">
             <div className="space-y-4">
@@ -327,9 +327,9 @@ function LogsContent() {
       <Dialog open={deletingItems.length > 0} onOpenChange={(open) => (!open ? setDeletingItems([]) : null)}>
         <DialogContent showCloseButton={false} className="rounded-2xl p-6">
           <DialogHeader className="gap-2">
-            <DialogTitle>{deletingItems.length === 1 ? "删除日志" : "删除所选日志"}</DialogTitle>
+            <DialogTitle>{deletingItems.length === 1 ? "Xóa nhật ký" : "Xóa nhật ký đã chọn"}</DialogTitle>
             <DialogDescription className="text-sm leading-6">
-              确认删除 {deletingItems.length} 条日志吗？删除后无法恢复。
+              Bạn có chắc muốn xóa {deletingItems.length} bản ghi nhật ký? Thao tác này không thể hoàn tác.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

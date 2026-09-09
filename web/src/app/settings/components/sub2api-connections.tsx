@@ -273,7 +273,7 @@ export function Sub2APIConnections() {
       }
       setDialogOpen(false);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "保存失败");
+      toast.error(error instanceof Error ? error.message : "Lưu thất bại");
     } finally {
       setIsSaving(false);
     }
@@ -537,7 +537,7 @@ export function Sub2APIConnections() {
           )}
 
           <div className="rounded-xl bg-stone-50 px-4 py-3 text-sm leading-6 text-stone-500">
-            <p className="font-medium text-stone-600">使用说明</p>
+            <p className="font-medium text-stone-600">Hướng dẫn sử dụng</p>
             <ul className="mt-1 list-inside list-disc space-y-0.5">
               <li>输入 Sub2API 地址和管理员账户（或 Admin API Key），保存为一个连接。</li>
               <li>点击某个连接的「同步」会拉取其中 platform=openai 且 type=oauth 的账号列表。</li>
