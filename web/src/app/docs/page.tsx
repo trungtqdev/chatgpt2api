@@ -21,7 +21,8 @@ import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useAuthGuard } from "@/lib/use-auth-guard";
+import { getValidatedAuthSession } from "@/lib/auth-session";
+import type { StoredAuthSession } from "@/store/auth";
 
 function CopyButton({ text, label }: { text: string; label?: string }) {
   const [copied, setCopied] = useState(false);
@@ -66,23 +67,24 @@ function CodeBlock({ code, language = "bash" }: { code: string; language?: strin
 }
 
 export default function DocsPage() {
-  const { isCheckingAuth, session } = useAuthGuard();
+  const [session, setSession] = useState<StoredAuthSession | null>(null);
   const [baseUrl, setBaseUrl] = useState("https://apikeygpt.pagee.io.vn/v1");
   const [activeTab, setActiveTab] = useState<"quickstart" | "clients" | "api" | "models" | "admin" | "faq">("quickstart");
 
   useEffect(() => {
+    let active = true;
+    void getValidatedAuthSession().then((s) => {
+      if (active) {
+        setSession(s);
+      }
+    });
     if (typeof window !== "undefined") {
       setBaseUrl(`${window.location.origin}/v1`);
     }
+    return () => {
+      active = false;
+    };
   }, []);
-
-  if (isCheckingAuth || !session) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <LoaderCircle className="size-6 animate-spin text-stone-400" />
-      </div>
-    );
-  }
 
   const curlGenCode = `curl ${baseUrl}/images/generations \\
   -H "Content-Type: application/json" \\
@@ -267,7 +269,7 @@ main();`;
           <span>Danh sách Model</span>
         </button>
 
-        {session.role === "admin" ? (
+        {session?.role === "admin" ? (
           <button
             type="button"
             onClick={() => setActiveTab("admin")}
@@ -622,7 +624,7 @@ main();`;
       )}
 
       {/* TAB CONTENT: ADMIN MANAGEMENT */}
-      {activeTab === "admin" && session.role === "admin" && (
+      {activeTab === "admin" && session?.role === "admin" && (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <Card className="border-stone-200 bg-white/80">
             <CardHeader>

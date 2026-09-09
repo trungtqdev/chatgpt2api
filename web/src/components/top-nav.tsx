@@ -60,7 +60,58 @@ export function TopNav() {
     router.replace("/login");
   };
 
-  if (pathname === "/login" || session === undefined || !session) {
+  if (pathname === "/login") {
+    return null;
+  }
+
+  if (session === undefined) {
+    return null;
+  }
+
+  if (!session) {
+    if (pathname === "/docs") {
+      return (
+        <header className="border-b border-stone-100/50">
+          <div className="flex min-h-12 flex-col gap-1 px-3 py-2 sm:h-12 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-6 sm:py-0">
+            <div className="flex items-center justify-between gap-2 sm:justify-start sm:gap-3">
+              <Link
+                href="/docs"
+                className="shrink-0 py-1 text-[15px] font-bold tracking-tight text-stone-950 transition hover:text-stone-700"
+              >
+                chatgpt2api
+              </Link>
+              <a
+                href="https://github.com/trungtqdev/chatgpt2api"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 py-1 text-sm text-stone-400 transition hover:text-stone-700"
+                aria-label="GitHub repository"
+              >
+                <Github className="size-4" />
+                <span className="hidden md:inline">GitHub</span>
+              </a>
+            </div>
+            <nav className="hide-scrollbar -mx-1 flex min-w-0 flex-1 gap-1 overflow-x-auto px-1 sm:mx-0 sm:justify-center sm:gap-8 sm:overflow-visible sm:px-0">
+              <Link
+                href="/docs"
+                className="relative shrink-0 whitespace-nowrap rounded-full bg-stone-950 px-2.5 py-1 text-[13px] font-medium text-white transition sm:rounded-none sm:bg-transparent sm:px-0 sm:text-[15px] sm:font-semibold sm:text-stone-950"
+              >
+                Hướng dẫn sử dụng
+                <span className="absolute inset-x-0 -bottom-[1px] hidden h-0.5 bg-stone-950 sm:block" />
+              </Link>
+            </nav>
+            <div className="flex items-center justify-end gap-2 sm:gap-3">
+              <Link
+                href="/login"
+                className="inline-flex items-center justify-center rounded-xl bg-stone-950 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-stone-800"
+              >
+                Đăng nhập
+              </Link>
+            </div>
+          </div>
+        </header>
+      );
+    }
     return null;
   }
 
