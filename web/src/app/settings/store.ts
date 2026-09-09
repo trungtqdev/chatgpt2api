@@ -284,7 +284,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
         config: normalized,
       });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "加载系统配置失败");
+      toast.error(error instanceof Error ? error.message : "Tải cấu hình hệ thống thất bại");
     } finally {
       set({ isLoadingConfig: false });
     }
@@ -332,10 +332,10 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
       set({
         config: normalizeConfig(data.config),
       });
-      toast.success("配置已保存");
+      toast.success("Đã lưu cấu hình");
       return true;
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "保存系统配置失败");
+      toast.error(error instanceof Error ? error.message : "Lưu cấu hình hệ thống thất bại");
       return false;
     } finally {
       set({ isSavingConfig: false });
@@ -475,7 +475,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
       });
     } catch (error) {
       if (!silent) {
-        toast.error(error instanceof Error ? error.message : "加载备份列表失败");
+        toast.error(error instanceof Error ? error.message : "Tải danh sách sao lưu thất bại");
       }
     } finally {
       if (!silent) {
@@ -492,10 +492,10 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
         return;
       }
       const data = await runBackupNow();
-      toast.success(`备份已完成：${data.result.key}`);
+      toast.success(`Đã sao lưu thành công: ${data.result.key}`);
       await get().loadBackups(true);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "执行备份失败");
+      toast.error(error instanceof Error ? error.message : "Thực hiện sao lưu thất bại");
     } finally {
       set({ isRunningBackup: false });
     }
@@ -505,10 +505,10 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
     set({ deletingBackupKey: key });
     try {
       await deleteBackup(key);
-      toast.success("备份已删除");
+      toast.success("Đã xóa bản sao lưu");
       await get().loadBackups(true);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "删除备份失败");
+      toast.error(error instanceof Error ? error.message : "Xóa bản sao lưu thất bại");
     } finally {
       set({ deletingBackupKey: null });
     }
@@ -522,9 +522,9 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
         return;
       }
       const data = await testBackupConnection();
-      toast.success(`R2 连接正常（HTTP ${data.result.status}）`);
+      toast.success(`Kết nối R2 thành công (HTTP ${data.result.status})`);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "测试备份连接失败");
+      toast.error(error instanceof Error ? error.message : "Kiểm tra kết nối sao lưu thất bại");
     } finally {
       set({ isTestingBackup: false });
     }
@@ -536,7 +536,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
       const data = await fetchRegisterConfig();
       set({ registerConfig: data.register });
     } catch (error) {
-      if (!silent) toast.error(error instanceof Error ? error.message : "加载注册配置失败");
+      if (!silent) toast.error(error instanceof Error ? error.message : "Tải cấu hình đăng ký thất bại");
     } finally {
       if (!silent) set({ isLoadingRegister: false });
     }
@@ -635,9 +635,9 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
         check_interval: Math.max(1, Number(registerConfig.check_interval) || 5),
       });
       set({ registerConfig: data.register });
-      toast.success("注册配置已保存");
+      toast.success("Đã lưu cấu hình đăng ký");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "保存注册配置失败");
+      toast.error(error instanceof Error ? error.message : "Lưu cấu hình đăng ký thất bại");
     } finally {
       set({ isSavingRegister: false });
     }
@@ -662,9 +662,9 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
       }
       const data = registerConfig.enabled ? await stopRegister() : await startRegister();
       set({ registerConfig: data.register });
-      toast.success(registerConfig.enabled ? "注册任务已停止" : "注册任务已启动");
+      toast.success(registerConfig.enabled ? "Đã dừng tác vụ đăng ký" : "Đã khởi động tác vụ đăng ký");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "切换注册状态失败");
+      toast.error(error instanceof Error ? error.message : "Chuyển trạng thái đăng ký thất bại");
     } finally {
       set({ isSavingRegister: false });
     }
@@ -675,9 +675,9 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
     try {
       const data = await resetRegisterApi();
       set({ registerConfig: data.register });
-      toast.success("注册统计已重置");
+      toast.success("Đã đặt lại số liệu thống kê");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "重置注册统计失败");
+      toast.error(error instanceof Error ? error.message : "Đặt lại thống kê thất bại");
     } finally {
       set({ isSavingRegister: false });
     }
@@ -692,7 +692,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
       set({ pools: data.pools });
     } catch (error) {
       if (!silent) {
-        toast.error(error instanceof Error ? error.message : "加载 CPA 连接失败");
+        toast.error(error instanceof Error ? error.message : "Tải kết nối CPA thất bại");
       }
     } finally {
       if (!silent) {
@@ -746,11 +746,11 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
   savePool: async () => {
     const { editingPool, formName, formBaseUrl, formSecretKey } = get();
     if (!formBaseUrl.trim()) {
-      toast.error("请输入 CPA 地址");
+      toast.error("Vui lòng nhập địa chỉ CPA");
       return;
     }
     if (!editingPool && !formSecretKey.trim()) {
-      toast.error("请输入 Secret Key");
+      toast.error("Vui lòng nhập Secret Key");
       return;
     }
 
@@ -763,7 +763,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
           secret_key: formSecretKey.trim() || undefined,
         });
         set({ pools: data.pools, dialogOpen: false });
-        toast.success("连接已更新");
+        toast.success("Đã cập nhật kết nối");
       } else {
         const data = await createCPAPool({
           name: formName.trim(),
@@ -771,7 +771,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
           secret_key: formSecretKey.trim(),
         });
         set({ pools: data.pools, dialogOpen: false });
-        toast.success("连接已添加");
+        toast.success("Đã thêm kết nối");
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Lưu thất bại");
@@ -785,9 +785,9 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
     try {
       const data = await deleteCPAPool(pool.id);
       set({ pools: data.pools });
-      toast.success("连接已删除");
+      toast.success("Đã xóa kết nối");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "删除失败");
+      toast.error(error instanceof Error ? error.message : "Xóa thất bại");
     } finally {
       set({ deletingId: null });
     }
@@ -806,9 +806,9 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
         filePage: 1,
         browserOpen: true,
       });
-      toast.success(`读取成功，共 ${files.length} 个远程账号`);
+      toast.success(`Đọc thành công ${files.length} tài khoản từ xa`);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "读取远程账号失败");
+      toast.error(error instanceof Error ? error.message : "Đọc tài khoản từ xa thất bại");
     } finally {
       set({ loadingFilesId: null });
     }
@@ -853,7 +853,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
       return;
     }
     if (selectedNames.length === 0) {
-      toast.error("请先选择要导入的账号");
+      toast.error("Vui lòng chọn tài khoản muốn nhập");
       return;
     }
 
@@ -866,9 +866,9 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
         ),
         browserOpen: false,
       });
-      toast.success("导入任务已启动");
+      toast.success("Tác vụ nhập đã bắt đầu");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "启动导入失败");
+      toast.error(error instanceof Error ? error.message : "Khởi động tác vụ nhập thất bại");
     } finally {
       set({ isStartingImport: false });
     }

@@ -271,7 +271,7 @@ export function AccountImportDialog({ disabled, onImported }: AccountImportDialo
               className="inline-flex items-center gap-1 text-sm text-stone-500 transition hover:text-stone-800"
             >
               <ArrowLeft className="size-4" />
-              返回导入方式
+              Quay lại phương thức nhập
             </button>
             <span className="text-xs text-stone-400">Đã nhận diện {tokenCount} Token</span>
           </div>
@@ -298,7 +298,7 @@ export function AccountImportDialog({ disabled, onImported }: AccountImportDialo
                 disabled={isSubmitting}
               >
                 <FileText className="size-4" />
-                选择 TXT
+                Chọn file TXT
               </Button>
             </div>
           </div>
@@ -322,10 +322,10 @@ export function AccountImportDialog({ disabled, onImported }: AccountImportDialo
             className="inline-flex items-center gap-1 text-sm text-stone-500 transition hover:text-stone-800"
           >
             <ArrowLeft className="size-4" />
-            返回导入方式
+            Quay lại phương thức nhập
           </button>
           <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4 text-sm leading-6 text-stone-600">
-            打开
+            Mở
             {" "}
             <a
               href={sessionUrl}
@@ -366,7 +366,7 @@ export function AccountImportDialog({ disabled, onImported }: AccountImportDialo
             className="inline-flex items-center gap-1 text-sm text-stone-500 transition hover:text-stone-800"
           >
             <ArrowLeft className="size-4" />
-            返回导入方式
+            Quay lại phương thức nhập
           </button>
           <div className="rounded-2xl border border-dashed border-stone-200 bg-stone-50 p-5">
             <div className="space-y-2">
@@ -382,7 +382,7 @@ export function AccountImportDialog({ disabled, onImported }: AccountImportDialo
               disabled={isSubmitting}
             >
               <Files className="size-4" />
-              选择多个 JSON 文件
+              Chọn nhiều file JSON
             </Button>
           </div>
           <input
@@ -458,7 +458,7 @@ export function AccountImportDialog({ disabled, onImported }: AccountImportDialo
           disabled={disabled}
         >
           <Upload className="size-4" />
-          导入
+          Nhập
         </Button>
         <DialogContent showCloseButton={false} className="rounded-2xl p-6">
           <DialogHeader className="gap-2">
@@ -491,7 +491,7 @@ export function AccountImportDialog({ disabled, onImported }: AccountImportDialo
               onClick={() => setOpen(false)}
               disabled={footerDisabled}
             >
-              取消
+              Hủy
             </Button>
             {method === "token" ? (
               <Button
@@ -500,7 +500,7 @@ export function AccountImportDialog({ disabled, onImported }: AccountImportDialo
                 disabled={footerDisabled}
               >
                 {isSubmitting ? <LoaderCircle className="size-4 animate-spin" /> : null}
-                导入 Token
+                Nhập Token
               </Button>
             ) : null}
             {method === "session" ? (
@@ -510,7 +510,7 @@ export function AccountImportDialog({ disabled, onImported }: AccountImportDialo
                 disabled={footerDisabled}
               >
                 {isSubmitting ? <LoaderCircle className="size-4 animate-spin" /> : null}
-                导入 JSON
+                Nhập JSON
               </Button>
             ) : null}
             {method === "cpa" ? (
@@ -522,7 +522,7 @@ export function AccountImportDialog({ disabled, onImported }: AccountImportDialo
                 onClick={() => setConfirmOpen(true)}
                 disabled={footerDisabled || !pendingCpaImport}
               >
-                查看导入确认
+                Xem xác nhận nhập
               </Button>
             ) : null}
           </DialogFooter>
@@ -549,7 +549,7 @@ export function AccountImportDialog({ disabled, onImported }: AccountImportDialo
               onClick={() => setConfirmOpen(false)}
               disabled={isSubmitting}
             >
-              返回
+              Quay lại
             </Button>
             <Button
               className="h-10 rounded-xl bg-stone-950 px-5 text-white hover:bg-stone-800"
@@ -557,7 +557,7 @@ export function AccountImportDialog({ disabled, onImported }: AccountImportDialo
               disabled={isSubmitting || !pendingCpaImport}
             >
               {isSubmitting ? <LoaderCircle className="size-4 animate-spin" /> : null}
-              确认导入
+              Xác nhận nhập
             </Button>
           </DialogFooter>
         </DialogContent>

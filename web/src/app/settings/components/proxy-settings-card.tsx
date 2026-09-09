@@ -55,12 +55,12 @@ export function ProxySettingsCard() {
               <Link2 className="size-5 text-stone-600" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold tracking-tight">全局代理</h2>
-              <p className="text-sm text-stone-500">为系统中的出站请求配置统一代理，保存后会立即生效。</p>
+              <h2 className="text-lg font-semibold tracking-tight">Proxy toàn cục</h2>
+              <p className="text-sm text-stone-500">Cấu hình proxy cho các yêu cầu ra ngoài của hệ thống, có hiệu lực ngay sau khi lưu.</p>
             </div>
           </div>
           <Badge variant={proxy.trim() ? "success" : "secondary"} className="w-fit rounded-md px-2.5 py-1">
-            {proxy.trim() ? "已配置" : "未配置"}
+            {proxy.trim() ? "Đã cấu hình" : "Chưa cấu hình"}
           </Badge>
         </div>
 
@@ -82,7 +82,7 @@ export function ProxySettingsCard() {
                 className="h-11 rounded-xl border-stone-200 bg-white"
               />
               <p className="text-sm text-stone-500">
-                留空表示不使用代理。请按完整地址填写，例如 `http://127.0.0.1:7890`、`http://用户名:密码@127.0.0.1:7890` 或 `socks5://127.0.0.1:7890`。
+                Để trống nếu không dùng proxy. Vui lòng nhập địa chỉ đầy đủ, ví dụ: `http://127.0.0.1:7890`, `http://user:pass@127.0.0.1:7890` hoặc `socks5://127.0.0.1:7890`.
               </p>
             </div>
 
@@ -95,8 +95,8 @@ export function ProxySettingsCard() {
                 }`}
               >
                 {testResult.ok
-                  ? `代理可用：HTTP ${testResult.status}，用时 ${testResult.latency_ms} ms`
-                  : `代理不可用：${testResult.error ?? "未知错误"}（用时 ${testResult.latency_ms} ms）`}
+                  ? `Proxy khả dụng: HTTP ${testResult.status}, thời gian ${testResult.latency_ms} ms`
+                  : `Proxy không khả dụng: ${testResult.error ?? "Lỗi không xác định"} (thời gian ${testResult.latency_ms} ms)`}
               </div>
             ) : null}
 
@@ -108,7 +108,7 @@ export function ProxySettingsCard() {
                 disabled={isTesting || isLoadingConfig}
               >
                 {isTesting ? <LoaderCircle className="size-4 animate-spin" /> : <PlugZap className="size-4" />}
-                测试代理
+                Kiểm tra Proxy
               </Button>
               <Button
                 className="h-10 rounded-xl bg-stone-950 px-5 text-white hover:bg-stone-800"
@@ -116,7 +116,7 @@ export function ProxySettingsCard() {
                 disabled={isSavingConfig}
               >
                 {isSavingConfig ? <LoaderCircle className="size-4 animate-spin" /> : <Save className="size-4" />}
-                保存配置
+                Lưu cấu hình
               </Button>
             </div>
           </>

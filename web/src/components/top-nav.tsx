@@ -17,9 +17,13 @@ const adminNavItems = [
   { href: "/image-manager", label: "Quản lý ảnh" },
   { href: "/logs", label: "Nhật ký" },
   { href: "/settings", label: "Cài đặt" },
+  { href: "/docs", label: "Hướng dẫn sử dụng" },
 ];
 
-const userNavItems = [{ href: "/image", label: "Tạo ảnh" }];
+const userNavItems = [
+  { href: "/image", label: "Tạo ảnh" },
+  { href: "/docs", label: "Hướng dẫn sử dụng" },
+];
 
 export function TopNav() {
   const pathname = usePathname();

@@ -64,9 +64,9 @@ export function ImportBrowserDialog() {
     <Dialog open={browserOpen} onOpenChange={setBrowserOpen}>
       <DialogContent showCloseButton={false} className="max-h-[90vh] max-w-5xl rounded-2xl p-6">
         <DialogHeader className="gap-2">
-          <DialogTitle>选择要导入的账号</DialogTitle>
+          <DialogTitle>Chọn tài khoản cần nhập</DialogTitle>
           <DialogDescription className="text-sm leading-6">
-            {browserPool ? `来自 ${browserPool.name || browserPool.base_url}` : "读取到的远程账号列表"}
+            {browserPool ? `Từ ${browserPool.name || browserPool.base_url}` : "Danh sách tài khoản từ xa"}
           </DialogDescription>
         </DialogHeader>
 
@@ -76,7 +76,7 @@ export function ImportBrowserDialog() {
             <Input
               value={fileQuery}
               onChange={(event) => setFileQuery(event.target.value)}
-              placeholder="搜索 email 或文件名"
+              placeholder="Tìm theo email hoặc tên file..."
               className="h-10 rounded-xl border-stone-200 bg-white pl-10"
             />
           </div>
@@ -88,7 +88,7 @@ export function ImportBrowserDialog() {
               <SelectContent>
                 {PAGE_SIZE_OPTIONS.map((item) => (
                   <SelectItem key={item} value={item}>
-                    {item} / 页
+                    {item} / trang
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -98,7 +98,7 @@ export function ImportBrowserDialog() {
               className="h-10 rounded-xl border-stone-200 bg-white px-4 text-stone-700"
               onClick={() => toggleSelectAllFiltered(!allFilteredSelected)}
             >
-              {allFilteredSelected ? "取消全选" : "全选筛选结果"}
+              {allFilteredSelected ? "Bỏ chọn tất cả" : "Chọn tất cả kết quả"}
             </Button>
           </div>
         </div>
@@ -107,13 +107,13 @@ export function ImportBrowserDialog() {
           <div className="flex items-center justify-between border-b border-stone-100 px-4 py-3 text-sm text-stone-500">
             <div className="flex items-center gap-3">
               <Checkbox checked={allFilteredSelected} onCheckedChange={(checked) => toggleSelectAllFiltered(Boolean(checked))} />
-              <span>筛选结果 {filteredFiles.length} 个</span>
+              <span>Kết quả lọc: {filteredFiles.length} mục</span>
             </div>
-            <span>已选 {selectedNames.length} 个</span>
+            <span>Đã chọn: {selectedNames.length} mục</span>
           </div>
           <div className="max-h-[420px] overflow-auto">
             {pagedFiles.length === 0 ? (
-              <div className="flex items-center justify-center py-12 text-sm text-stone-400">没有匹配的远程账号</div>
+              <div className="flex items-center justify-center py-12 text-sm text-stone-400">Không tìm thấy tài khoản từ xa phù hợp</div>
             ) : (
               <div className="divide-y divide-stone-100">
                 {pagedFiles.map((item) => (
@@ -135,8 +135,8 @@ export function ImportBrowserDialog() {
 
         <div className="flex items-center justify-between text-sm text-stone-500">
           <span>
-            第 {filteredFiles.length === 0 ? 0 : (safeFilePage - 1) * currentPageSize + 1} -{" "}
-            {Math.min(safeFilePage * currentPageSize, filteredFiles.length)} 条，共 {filteredFiles.length} 条
+            Hiển thị {filteredFiles.length === 0 ? 0 : (safeFilePage - 1) * currentPageSize + 1} -{" "}
+            {Math.min(safeFilePage * currentPageSize, filteredFiles.length)} mục, tổng {filteredFiles.length} mục
           </span>
           <div className="flex items-center gap-2">
             <Button
@@ -145,7 +145,7 @@ export function ImportBrowserDialog() {
               onClick={() => setFilePage(Math.max(1, safeFilePage - 1))}
               disabled={safeFilePage <= 1}
             >
-              上一页
+              Trang trước
             </Button>
             <span>
               {safeFilePage}/{filePageCount}
@@ -156,7 +156,7 @@ export function ImportBrowserDialog() {
               onClick={() => setFilePage(Math.min(filePageCount, safeFilePage + 1))}
               disabled={safeFilePage >= filePageCount}
             >
-              下一页
+              Trang sau
             </Button>
           </div>
         </div>
@@ -168,7 +168,7 @@ export function ImportBrowserDialog() {
             onClick={() => setBrowserOpen(false)}
             disabled={isStartingImport}
           >
-            取消
+            Hủy
           </Button>
           <Button
             className="h-10 rounded-xl bg-stone-950 px-5 text-white hover:bg-stone-800"
@@ -176,7 +176,7 @@ export function ImportBrowserDialog() {
             disabled={isStartingImport || selectedNames.length === 0}
           >
             {isStartingImport ? <LoaderCircle className="size-4 animate-spin" /> : <Import className="size-4" />}
-            导入选中账号
+            Nhập tài khoản đã chọn
           </Button>
         </DialogFooter>
       </DialogContent>

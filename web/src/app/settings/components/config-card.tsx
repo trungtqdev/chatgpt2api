@@ -71,21 +71,21 @@ export function ConfigCard() {
     <Card className="rounded-2xl border-white/80 bg-white/90 shadow-sm">
       <CardContent className="space-y-4 p-6">
         <div className="rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm leading-6 text-stone-600">
-          管理员登录密钥继续从部署配置读取，不再在此页面展示；如需分发给其他人，请在下方创建普通用户密钥。
+          Khóa đăng nhập quản trị viên được nạp từ cấu hình hệ thống, không hiển thị tại đây. Để cấp quyền cho người khác, hãy tạo khóa người dùng thông thường bên dưới.
         </div>
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <label className="text-sm text-stone-700">账号刷新间隔</label>
+            <label className="text-sm text-stone-700">Khoảng thời gian làm mới tài khoản</label>
             <Input
               value={String(config?.refresh_account_interval_minute || "")}
               onChange={(event) => setRefreshAccountIntervalMinute(event.target.value)}
-              placeholder="分钟"
+              placeholder="Số phút"
               className="h-10 rounded-xl border-stone-200 bg-white"
             />
-            <p className="text-xs text-stone-500">单位分钟，控制账号自动刷新频率。</p>
+            <p className="text-xs text-stone-500">Tính bằng phút, điều khiển tần suất tự động làm mới tài khoản.</p>
           </div>
           <div className="space-y-2">
-            <label className="text-sm text-stone-700">全局代理</label>
+            <label className="text-sm text-stone-700">Proxy toàn cục</label>
             <Input
               value={String(config?.proxy || "")}
               onChange={(event) => {
@@ -95,7 +95,7 @@ export function ConfigCard() {
               placeholder="http://127.0.0.1:7890"
               className="h-10 rounded-xl border-stone-200 bg-white"
             />
-            <p className="text-xs text-stone-500">留空表示不使用代理。</p>
+            <p className="text-xs text-stone-500">Để trống nếu không dùng proxy.</p>
             {proxyTestResult ? (
               <div
                 className={`rounded-xl border px-3 py-2 text-xs leading-6 ${
@@ -105,8 +105,8 @@ export function ConfigCard() {
                 }`}
               >
                 {proxyTestResult.ok
-                  ? `代理可用：HTTP ${proxyTestResult.status}，用时 ${proxyTestResult.latency_ms} ms`
-                  : `代理不可用：${proxyTestResult.error ?? "未知错误"}（用时 ${proxyTestResult.latency_ms} ms）`}
+                  ? `Proxy khả dụng: HTTP ${proxyTestResult.status}, thời gian ${proxyTestResult.latency_ms} ms`
+                  : `Proxy không khả dụng: ${proxyTestResult.error ?? "Lỗi không xác định"} (thời gian ${proxyTestResult.latency_ms} ms)`}
               </div>
             ) : null}
             <div className="flex justify-end">
@@ -118,68 +118,68 @@ export function ConfigCard() {
                 disabled={isTestingProxy}
               >
                 {isTestingProxy ? <LoaderCircle className="size-4 animate-spin" /> : <PlugZap className="size-4" />}
-                测试代理
+                Kiểm tra Proxy
               </Button>
             </div>
           </div>
           <div className="space-y-2">
-            <label className="text-sm text-stone-700">图片访问地址</label>
+            <label className="text-sm text-stone-700">Đường dẫn truy cập ảnh (Base URL)</label>
             <Input
               value={String(config?.base_url || "")}
               onChange={(event) => setBaseUrl(event.target.value)}
               placeholder="https://example.com"
               className="h-10 rounded-xl border-stone-200 bg-white"
             />
-            <p className="text-xs text-stone-500">用于生成图片结果的访问前缀地址。</p>
+            <p className="text-xs text-stone-500">Tiền tố đường dẫn công khai dùng để hiển thị hình ảnh.</p>
           </div>
           <div className="space-y-2">
-            <label className="text-sm text-stone-700">图片自动清理</label>
+            <label className="text-sm text-stone-700">Tự động dọn dẹp ảnh</label>
             <Input
               value={String(config?.image_retention_days || "")}
               onChange={(event) => setImageRetentionDays(event.target.value)}
               placeholder="30"
               className="h-10 rounded-xl border-stone-200 bg-white"
             />
-            <p className="text-xs text-stone-500">自动删除多少天前的本地图片。</p>
+            <p className="text-xs text-stone-500">Tự động xóa ảnh cục bộ lưu trữ quá số ngày này.</p>
           </div>
           <div className="space-y-2">
-            <label className="text-sm text-stone-700">图片轮询超时</label>
+            <label className="text-sm text-stone-700">Thời gian chờ nhận ảnh</label>
             <Input
               value={String(config?.image_poll_timeout_secs || "")}
               onChange={(event) => setImagePollTimeoutSecs(event.target.value)}
               placeholder="120"
               className="h-10 rounded-xl border-stone-200 bg-white"
             />
-            <p className="text-xs text-stone-500">单位秒，等待上游图片结果的最长时间。</p>
+            <p className="text-xs text-stone-500">Tính bằng giây, thời gian chờ tối đa kết quả ảnh từ upstream.</p>
           </div>
           <div className="space-y-2">
-            <label className="text-sm text-stone-700">单账号图片并发</label>
+            <label className="text-sm text-stone-700">Số ảnh đồng thời / tài khoản</label>
             <Input
               value={String(config?.image_account_concurrency || "")}
               onChange={(event) => setImageAccountConcurrency(event.target.value)}
               placeholder="1"
               className="h-10 rounded-xl border-stone-200 bg-white"
             />
-            <p className="text-xs text-stone-500">限制每个账号同时处理的图片请求数量，默认 3。</p>
+            <p className="text-xs text-stone-500">Giới hạn số lượng tác vụ vẽ đồng thời trên mỗi tài khoản (mặc định 3).</p>
           </div>
           <label className="flex items-center gap-3 rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-700">
             <Checkbox
               checked={Boolean(config?.auto_remove_invalid_accounts)}
               onCheckedChange={(checked) => setAutoRemoveInvalidAccounts(Boolean(checked))}
             />
-            自动移除异常账号
+            Tự động loại bỏ tài khoản bất thường
           </label>
           <label className="flex items-center gap-3 rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-700">
             <Checkbox
               checked={Boolean(config?.auto_remove_rate_limited_accounts)}
               onCheckedChange={(checked) => setAutoRemoveRateLimitedAccounts(Boolean(checked))}
             />
-            自动移除限流账号
+            Tự động loại bỏ tài khoản bị giới hạn (Rate-limit)
           </label>
           <div className="space-y-3 rounded-xl border border-stone-200 bg-white px-4 py-3">
             <div>
-              <label className="text-sm text-stone-700">控制台日志级别</label>
-              <p className="mt-1 text-xs text-stone-500">不选择时使用默认 info / warning / error。</p>
+              <label className="text-sm text-stone-700">Mức nhật ký console</label>
+              <p className="mt-1 text-xs text-stone-500">Mặc định sử dụng info / warning / error.</p>
             </div>
             <div className="grid grid-cols-2 gap-2">
               {logLevelOptions.map((level) => (
@@ -194,14 +194,14 @@ export function ConfigCard() {
             </div>
           </div>
           <div className="space-y-2 md:col-span-2">
-            <label className="text-sm text-stone-700">全局附加指令</label>
+            <label className="text-sm text-stone-700">Chỉ thị hệ thống toàn cục (System Prompt)</label>
             <Textarea
               value={String(config?.global_system_prompt || "")}
               onChange={(event) => setGlobalSystemPrompt(event.target.value)}
-              placeholder="例如：先判断用户提示词是否合规；遇到违法、色情、暴力、仇恨等请求时拒绝回答。"
+              placeholder="Ví dụ: Hãy đóng vai trợ lý AI chuyên tạo ảnh nghệ thuật chất lượng cao..."
               className="min-h-28 rounded-xl border-stone-200 bg-white font-mono text-xs shadow-none"
             />
-            <p className="text-xs text-stone-500">每次请求都会作为 system 消息注入，可用于审核用户提示词、避免违规内容、统一约束模型行为或固定角色设定。</p>
+            <p className="text-xs text-stone-500">Chèn thêm vào mọi yêu cầu dưới dạng system prompt, giúp điều hướng hành vi mô hình.</p>
           </div>
           <div className="space-y-2 md:col-span-2">
             <label className="text-sm text-stone-700">Từ khóa nhạy cảm</label>
@@ -240,7 +240,7 @@ export function ConfigCard() {
             </div>
             <div className="space-y-2">
               <label className="text-sm text-stone-700">Câu lệnh kiểm duyệt</label>
-              <Textarea value={String(config?.ai_review?.prompt || "")} onChange={(event) => setAIReviewField("prompt", event.target.value)} placeholder="判断用户请求是否允许。只回答 ALLOW 或 REJECT。" className="min-h-24 rounded-xl border-stone-200 bg-white text-xs shadow-none" />
+              <Textarea value={String(config?.ai_review?.prompt || "")} onChange={(event) => setAIReviewField("prompt", event.target.value)} placeholder="Kiểm tra yêu cầu của người dùng. Chỉ trả lời ALLOW hoặc REJECT." className="min-h-24 rounded-xl border-stone-200 bg-white text-xs shadow-none" />
             </div>
           </div>
         </div>
@@ -252,7 +252,7 @@ export function ConfigCard() {
             disabled={isSavingConfig}
           >
             {isSavingConfig ? <LoaderCircle className="size-4 animate-spin" /> : <Save className="size-4" />}
-            保存
+            Lưu
           </Button>
         </div>
       </CardContent>

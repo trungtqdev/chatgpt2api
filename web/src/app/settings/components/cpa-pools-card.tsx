@@ -32,10 +32,10 @@ export function CPAPoolsCard() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {pools.length > 0 ? <Badge className="rounded-md px-2.5 py-1">{pools.length} 个连接</Badge> : null}
+            {pools.length > 0 ? <Badge className="rounded-md px-2.5 py-1">{pools.length} kết nối</Badge> : null}
             <Button className="h-9 rounded-xl bg-stone-950 px-4 text-white hover:bg-stone-800" onClick={openAddDialog}>
               <Plus className="size-4" />
-              添加连接
+              Thêm kết nối
             </Button>
           </div>
         </div>
@@ -74,7 +74,7 @@ export function CPAPoolsCard() {
                         className="rounded-lg p-2 text-stone-400 transition hover:bg-stone-100 hover:text-stone-700"
                         onClick={() => openEditDialog(pool)}
                         disabled={isBusy}
-                        title="编辑"
+                        title="Chỉnh sửa"
                       >
                         <Pencil className="size-4" />
                       </button>
@@ -83,7 +83,7 @@ export function CPAPoolsCard() {
                         className="rounded-lg p-2 text-stone-400 transition hover:bg-rose-50 hover:text-rose-500"
                         onClick={() => void deletePool(pool)}
                         disabled={isBusy}
-                        title="删除"
+                        title="Xóa"
                       >
                         {deletingId === pool.id ? (
                           <LoaderCircle className="size-4 animate-spin" />
@@ -106,21 +106,21 @@ export function CPAPoolsCard() {
                       ) : (
                         <Import className="size-3.5" />
                       )}
-                      同步
+                      Đồng bộ
                     </Button>
                   </div>
 
                   {importJob ? (
                     <div className="space-y-2 rounded-xl bg-stone-50 px-3 py-3">
-                      <div className="text-xs font-medium tracking-[0.16em] text-stone-400 uppercase">导入任务</div>
+                      <div className="text-xs font-medium tracking-[0.16em] text-stone-400 uppercase">TÁC VỤ NHẬP</div>
                       <div className="rounded-lg border border-stone-200 bg-white px-3 py-3">
                         <div className="flex items-center justify-between gap-3">
                           <div className="min-w-0">
                             <div className="text-sm font-medium text-stone-700">
-                              状态 {importJob.status}，已处理 {importJob.completed}/{importJob.total}
+                              Trạng thái {importJob.status}, đã xử lý {importJob.completed}/{importJob.total}
                             </div>
                             <div className="truncate text-xs text-stone-400">
-                              任务 {importJob.job_id.slice(0, 8)} · {importJob.created_at}
+                              Tác vụ {importJob.job_id.slice(0, 8)} · {importJob.created_at}
                             </div>
                           </div>
                           <Badge
@@ -140,10 +140,10 @@ export function CPAPoolsCard() {
                           <div className="h-full rounded-full bg-stone-900 transition-all" style={{ width: `${progress}%` }} />
                         </div>
                         <div className="mt-2 flex flex-wrap gap-2 text-xs text-stone-500">
-                          <span>新增 {importJob.added}</span>
-                          <span>跳过 {importJob.skipped}</span>
-                          <span>刷新 {importJob.refreshed}</span>
-                          <span>失败 {importJob.failed}</span>
+                          <span>Thêm mới {importJob.added}</span>
+                          <span>Bỏ qua {importJob.skipped}</span>
+                          <span>Làm mới {importJob.refreshed}</span>
+                          <span>Thất bại {importJob.failed}</span>
                         </div>
                       </div>
                     </div>
@@ -157,10 +157,10 @@ export function CPAPoolsCard() {
         <div className="rounded-xl bg-stone-50 px-4 py-3 text-sm leading-6 text-stone-500">
           <p className="font-medium text-stone-600">Hướng dẫn sử dụng</p>
           <ul className="mt-1 list-inside list-disc space-y-0.5">
-            <li>页面进入后先读取系统里已配置的 CPA 连接。</li>
-            <li>点击某个连接的「同步」后，会先读取远程账号列表并展示给前端选择。</li>
-            <li>确认选择后，后端后台下载对应 access_token 并导入本地号池。</li>
-            <li>前端只轮询导入进度，不直接参与 download。</li>
+            <li>Hệ thống sẽ tải danh sách các kết nối CPA đã được cấu hình.</li>
+            <li>Nhấn "Đồng bộ" tại kết nối mong muốn để xem danh sách tài khoản từ xa và chọn nhập.</li>
+            <li>Sau khi xác nhận, máy chủ sẽ tự động tải access_token và lưu vào nhóm tài khoản.</li>
+            <li>Giao diện chỉ theo dõi tiến độ, việc tải diễn ra an toàn trên máy chủ.</li>
           </ul>
         </div>
       </CardContent>

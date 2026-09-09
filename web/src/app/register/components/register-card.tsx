@@ -71,7 +71,7 @@ export function RegisterCard() {
             </div>
             <Button className="h-9 rounded-xl bg-stone-950 px-4 text-white hover:bg-stone-800" onClick={() => void save()} disabled={isSaving || config.enabled}>
               {isSaving ? <LoaderCircle className="size-4 animate-spin" /> : <Save className="size-4" />}
-              保存配置
+              Lưu cấu hình
             </Button>
           </div>
 
@@ -123,7 +123,7 @@ export function RegisterCard() {
               </div>
               <Button type="button" variant="outline" className="h-9 rounded-xl border-stone-200 bg-white px-3 text-stone-700" onClick={addProvider} disabled={config.enabled}>
                 <Plus className="size-4" />
-                添加
+                Thêm
               </Button>
             </div>
 
@@ -151,9 +151,9 @@ export function RegisterCard() {
                     <div className="flex items-center justify-between gap-3">
                       <label className="flex items-center gap-3 text-sm text-stone-700">
                         <Checkbox checked={Boolean(provider.enable)} onCheckedChange={(checked) => updateProvider(index, { enable: Boolean(checked) })} disabled={config.enabled} />
-                        启用
+                        Bật
                       </label>
-                      <button type="button" className="rounded-lg p-2 text-stone-400 transition hover:bg-rose-50 hover:text-rose-500 disabled:opacity-50" onClick={() => deleteProvider(index)} disabled={config.enabled || providers.length <= 1} title="删除 provider">
+                      <button type="button" className="rounded-lg p-2 text-stone-400 transition hover:bg-rose-50 hover:text-rose-500 disabled:opacity-50" onClick={() => deleteProvider(index)} disabled={config.enabled || providers.length <= 1} title="Xóa nhà cung cấp">
                         <Trash2 className="size-4" />
                       </button>
                     </div>
@@ -193,7 +193,7 @@ export function RegisterCard() {
                       {type === "inbucket" ? (
                         <label className="flex items-center gap-3 pt-8 text-sm text-stone-700">
                           <Checkbox checked={Boolean(provider.random_subdomain ?? true)} onCheckedChange={(checked) => updateProvider(index, { random_subdomain: Boolean(checked) })} disabled={config.enabled} />
-                          启用随机子域名
+                          Bật tên miền phụ ngẫu nhiên
                         </label>
                       ) : null}
                       {type === "tempmail_lol" || type === "moemail" || type === "duckmail" || type === "gptmail" || type === "yyds_mail" ? (
@@ -225,7 +225,7 @@ export function RegisterCard() {
                     {type === "tempmail_lol" || type === "cloudflare_temp_email" || type === "moemail" || type === "inbucket" || type === "yyds_mail" ? (
                       <div className="space-y-2">
                         <label className="text-sm text-stone-700">{type === "inbucket" ? "Danh sách tên miền cơ sở" : "Domain"}</label>
-                        <Textarea value={domains} onChange={(event) => updateProvider(index, { domain: event.target.value.split(/[\n,]/).map((item) => item.trim()).filter(Boolean) })} placeholder={type === "inbucket" ? "Mỗi dòng một tên miền cơ sở, hệ thống sẽ tự động tạo subdomain ngẫu nhiên" : type === "moemail" ? "每行一个域名" : "Mỗi dòng một tên miền, để trống để dùng mặc định"} className="min-h-20 rounded-xl border-stone-200 bg-white font-mono text-xs" disabled={config.enabled} />
+                        <Textarea value={domains} onChange={(event) => updateProvider(index, { domain: event.target.value.split(/[\n,]/).map((item) => item.trim()).filter(Boolean) })} placeholder={type === "inbucket" ? "Mỗi dòng một tên miền cơ sở, hệ thống sẽ tự động tạo subdomain ngẫu nhiên" : type === "moemail" ? "Mỗi dòng một tên miền" : "Mỗi dòng một tên miền, để trống để dùng mặc định"} className="min-h-20 rounded-xl border-stone-200 bg-white font-mono text-xs" disabled={config.enabled} />
                       </div>
                     ) : null}
                   </div>
@@ -271,11 +271,11 @@ export function RegisterCard() {
               </Button>
               <Button variant="outline" className="h-10 rounded-xl border-stone-200 bg-white px-3 text-stone-700" onClick={() => void reset()} disabled={isSaving || config.enabled}>
                 <RotateCcw className="size-4" />
-                重置
+                Đặt lại
               </Button>
               <Button variant="outline" className="h-10 rounded-xl border-stone-200 bg-white px-3 text-stone-700" onClick={() => void save()} disabled={isSaving || config.enabled}>
                 <Save className="size-4" />
-                保存
+                Lưu
               </Button>
             </div>
             <div className="flex items-center gap-2 border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">

@@ -142,7 +142,7 @@ export function ProxySettingsCard() {
             <div className="space-y-2">
               <label className="flex items-center gap-1.5 text-sm font-medium text-stone-700">
                 <PlugZap className="size-3.5" />
-                代理地址
+                Địa chỉ Proxy
               </label>
               <Input
                 value={formUrl}
@@ -165,10 +165,10 @@ export function ProxySettingsCard() {
               >
                 {testResult.ok ? (
                   <>
-                    代理可用：HTTP {testResult.status}，用时 {testResult.latency_ms} ms
+                    Proxy hoạt động: HTTP {testResult.status}, thời gian {testResult.latency_ms} ms
                   </>
                 ) : (
-                  <>代理不可用：{testResult.error ?? "未知错误"}（用时 {testResult.latency_ms} ms）</>
+                  <>Proxy không hoạt động: {testResult.error ?? "Lỗi không xác định"} (thời gian {testResult.latency_ms} ms)</>
                 )}
               </div>
             ) : null}
@@ -180,7 +180,7 @@ export function ProxySettingsCard() {
                 disabled={isSaving || !dirty}
               >
                 {isSaving ? <LoaderCircle className="size-4 animate-spin" /> : <Save className="size-4" />}
-                保存
+                Lưu
               </Button>
               <Button
                 variant="outline"
@@ -189,7 +189,7 @@ export function ProxySettingsCard() {
                 disabled={isTesting}
               >
                 {isTesting ? <LoaderCircle className="size-4 animate-spin" /> : <PlugZap className="size-4" />}
-                测试连通
+                Kiểm tra kết nối
               </Button>
             </div>
           </div>
