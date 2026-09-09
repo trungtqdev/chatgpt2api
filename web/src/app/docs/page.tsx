@@ -665,6 +665,9 @@ main();`;
                 <li>
                   <strong>Hỗ trợ Proxy toàn cục:</strong> Cấu hình HTTP/HTTPS/SOCKS5 trong mục <strong>Cài đặt → Cài đặt Proxy</strong> để tránh rủi ro chặn IP từ OpenAI.
                 </li>
+                <li>
+                  <strong>Kiểm soát truy cập theo IP (IP Whitelist):</strong> Giới hạn danh sách các địa chỉ IP hoặc dải mạng CIDR được phép gọi API trong mục <strong>Cài đặt → Kiểm soát truy cập IP</strong> để ngăn chặn việc sử dụng trái phép khi bị lộ API Key.
+                </li>
               </ul>
             </CardContent>
           </Card>

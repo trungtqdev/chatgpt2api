@@ -231,6 +231,27 @@ class ConfigStore:
         return str(self.data.get("global_system_prompt") or "").strip()
 
     @property
+    def ip_access_mode(self) -> str:
+        mode = str(self.data.get("ip_access_mode") or "all").strip().lower()
+        return "whitelist" if mode == "whitelist" else "all"
+
+    @property
+    def allowed_ips(self) -> list[str]:
+        ips = self.data.get("allowed_ips")
+        if isinstance(ips, list):
+            return [ip for item in ips if (ip := str(item or "").strip())]
+        if isinstance(ips, str):
+            return [ip for item in ips.splitlines() if (ip := item.strip())]
+        return []
+
+    @property
+    def ip_whitelist_bypass_admin(self) -> bool:
+        value = self.data.get("ip_whitelist_bypass_admin", True)
+        if isinstance(value, str):
+            return value.strip().lower() in {"1", "true", "yes", "on"}
+        return bool(value)
+
+    @property
     def images_dir(self) -> Path:
         path = DATA_DIR / "images"
         path.mkdir(parents=True, exist_ok=True)
@@ -284,6 +305,9 @@ class ConfigStore:
         data["sensitive_words"] = self.sensitive_words
         data["ai_review"] = self.ai_review
         data["global_system_prompt"] = self.global_system_prompt
+        data["ip_access_mode"] = self.ip_access_mode
+        data["allowed_ips"] = self.allowed_ips
+        data["ip_whitelist_bypass_admin"] = self.ip_whitelist_bypass_admin
         data["backup"] = self.get_backup_settings()
         data.pop("auth-key", None)
         return data
@@ -296,6 +320,17 @@ class ConfigStore:
         next_data.update(dict(data or {}))
         if "backup" in next_data:
             next_data["backup"] = _normalize_backup_settings(next_data.get("backup"))
+        if "allowed_ips" in next_data:
+            ips = next_data.get("allowed_ips")
+            if isinstance(ips, str):
+                next_data["allowed_ips"] = [ip for item in ips.splitlines() if (ip := item.strip())]
+            elif isinstance(ips, list):
+                next_data["allowed_ips"] = [ip for item in ips if (ip := str(item or "").strip())]
+        if "ip_access_mode" in next_data:
+            mode = str(next_data.get("ip_access_mode") or "all").strip().lower()
+            next_data["ip_access_mode"] = "whitelist" if mode == "whitelist" else "all"
+        if "ip_whitelist_bypass_admin" in next_data:
+            next_data["ip_whitelist_bypass_admin"] = _normalize_bool(next_data.get("ip_whitelist_bypass_admin"), True)
         next_data.pop("backup_state", None)
         self.data = next_data
         self._save()

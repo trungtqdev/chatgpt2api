@@ -68,6 +68,10 @@ export type SettingsConfig = {
   auto_remove_invalid_accounts?: boolean;
   auto_remove_rate_limited_accounts?: boolean;
   log_levels?: string[];
+  ip_access_mode?: "all" | "whitelist";
+  allowed_ips?: string[];
+  ip_whitelist_bypass_admin?: boolean;
+  client_ip?: string;
   backup?: BackupSettings;
   backup_state?: BackupState;
   [key: string]: unknown;

@@ -46,5 +46,8 @@
       "images": false
     }
   },
-  "image_account_concurrency": 3
+  "image_account_concurrency": 3,
+  "ip_access_mode": "all",
+  "allowed_ips": [],
+  "ip_whitelist_bypass_admin": true
 }

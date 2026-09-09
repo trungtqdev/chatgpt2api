@@ -12,6 +12,7 @@ from services.backup_service import BackupError, backup_service
 from services.config import config
 from services.image_service import delete_images, download_images_zip, get_image_download_response, get_thumbnail_response, list_images
 from services.image_tags_service import delete_tag, get_all_tags, set_tags
+from services.ip_filter import get_client_ip
 from services.log_service import log_service
 from services.proxy_service import test_proxy
 
@@ -62,9 +63,11 @@ def create_router(app_version: str) -> APIRouter:
         return {"version": app_version}
 
     @router.get("/api/settings")
-    async def get_settings(authorization: str | None = Header(default=None)):
+    async def get_settings(request: Request, authorization: str | None = Header(default=None)):
         require_admin(authorization)
-        return {"config": config.get()}
+        cfg = config.get()
+        cfg["client_ip"] = get_client_ip(request)
+        return {"config": cfg}
 
     @router.post("/api/settings")
     async def save_settings(body: SettingsUpdateRequest, authorization: str | None = Header(default=None)):
