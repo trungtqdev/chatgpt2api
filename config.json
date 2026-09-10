@@ -12,7 +12,7 @@
     "warning"
   ],
   "proxy": "",
-  "base_url": "",
+  "base_url": "https://apikeygpt.pagee.io.vn",
   "sensitive_words": [],
   "global_system_prompt": "",
   "ai_review": {

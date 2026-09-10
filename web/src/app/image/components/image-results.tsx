@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Clock3, Download, LoaderCircle, RotateCcw, Sparkles, Trash2 } from "lucide-react";
 
+import { resolveImageUrl } from "@/components/image-thumbnail";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { ImageConversation, ImageTurnStatus, StoredImage, StoredReferenceImage } from "@/store/image-conversations";
@@ -30,7 +31,7 @@ function getStoredImageSrc(image: StoredImage) {
   if (image.b64_json) {
     return `data:image/png;base64,${image.b64_json}`;
   }
-  return image.url || "";
+  return resolveImageUrl(image.url || "");
 }
 
 async function downloadStoredImage(image: StoredImage, index: number) {
@@ -41,7 +42,8 @@ async function downloadStoredImage(image: StoredImage, index: number) {
     for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
     blob = new Blob([bytes], { type: "image/png" });
   } else if (image.url) {
-    const res = await fetch(image.url);
+    const targetUrl = resolveImageUrl(image.url);
+    const res = await fetch(targetUrl);
     blob = await res.blob();
   } else {
     return;

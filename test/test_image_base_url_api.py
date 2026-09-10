@@ -38,6 +38,15 @@ class ImageBaseUrlApiTests(unittest.TestCase):
 
         self.assertEqual(api_support.resolve_image_base_url(request), "https://public.example.com")
 
+    def test_respects_x_forwarded_proto_and_host(self) -> None:
+        self.fake_config.base_url = ""
+        request = SimpleNamespace(
+            url=SimpleNamespace(scheme="http", netloc="127.0.0.1:3300"),
+            headers={"x-forwarded-proto": "https", "x-forwarded-host": "apikeygpt.pagee.io.vn"},
+        )
+
+        self.assertEqual(api_support.resolve_image_base_url(request), "https://apikeygpt.pagee.io.vn")
+
 
 if __name__ == "__main__":
     unittest.main()

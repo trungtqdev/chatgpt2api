@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { DateRangeFilter } from "@/components/date-range-filter";
 import { ImageLightbox } from "@/components/image-lightbox";
+import { ImageThumbnail, getImageThumbnailUrl, resolveImageUrl } from "@/components/image-thumbnail";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -82,7 +83,7 @@ function ImageManagerContent() {
 
   const lightboxImages = filteredItems.map((item) => ({
     id: item.name,
-    src: item.url,
+    src: resolveImageUrl(item.url),
     sizeLabel: formatSize(item.size),
     dimensions: item.width && item.height ? `${item.width} x ${item.height}` : undefined,
   }));
@@ -375,15 +376,11 @@ function ImageManagerContent() {
                       setLightboxOpen(true);
                     }}
                   >
-                    <img
-                      src={item.thumbnail_url || item.url}
+                    <ImageThumbnail
+                      src={item.url}
+                      thumbnailSrc={item.thumbnail_url || getImageThumbnailUrl(item.url)}
                       alt={item.name}
                       className="h-full w-full object-cover transition group-hover:scale-[1.02]"
-                      onError={(event) => {
-                        if (event.currentTarget.src !== item.url) {
-                          event.currentTarget.src = item.url;
-                        }
-                      }}
                     />
                     <span className="absolute right-2 bottom-2 rounded-full bg-black/50 p-2 text-white opacity-100 transition sm:opacity-0 sm:group-hover:opacity-100">
                       <Maximize2 className="size-4" />
@@ -532,11 +529,11 @@ function ImageManagerContent() {
           </p>
           {deleteTarget ? (
             <div className="flex items-center gap-3 overflow-hidden rounded-xl border border-stone-200 bg-stone-50 p-3">
-              <img
-                src={deleteTarget.thumbnail_url || deleteTarget.url}
+              <ImageThumbnail
+                src={deleteTarget.url}
+                thumbnailSrc={deleteTarget.thumbnail_url || getImageThumbnailUrl(deleteTarget.url)}
                 alt=""
                 className="size-16 shrink-0 rounded-lg object-cover"
-                onError={(e) => { if (e.currentTarget.src !== deleteTarget.url) e.currentTarget.src = deleteTarget.url; }}
               />
               <div className="min-w-0 overflow-hidden text-xs text-stone-500">
                 <div className="truncate font-medium text-stone-700">{deleteTarget.name}</div>

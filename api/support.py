@@ -10,7 +10,7 @@ from services.auth_service import auth_service
 from services.config import config
 
 BASE_DIR = Path(__file__).resolve().parents[1]
-WEB_DIST_DIR = BASE_DIR / "web_dist"
+WEB_DIST_DIR = (BASE_DIR / "web_dist") if (BASE_DIR / "web_dist").exists() else (BASE_DIR / "web" / "out")
 
 
 def extract_bearer_token(authorization: str | None) -> str:
@@ -47,7 +47,11 @@ def require_admin(authorization: str | None) -> dict[str, object]:
 
 
 def resolve_image_base_url(request: Request) -> str:
-    return config.base_url or f"{request.url.scheme}://{request.headers.get('host', request.url.netloc)}"
+    if config.base_url:
+        return config.base_url
+    scheme = request.headers.get("x-forwarded-proto") or request.url.scheme
+    host = request.headers.get("x-forwarded-host") or request.headers.get("host") or request.url.netloc
+    return f"{scheme}://{host}".rstrip("/")
 
 
 def raise_image_quota_error(exc: Exception) -> None:

@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 import { DateRangeFilter } from "@/components/date-range-filter";
 import { ImageLightbox } from "@/components/image-lightbox";
-import { ImageThumbnail, getImageThumbnailUrl } from "@/components/image-thumbnail";
+import { ImageThumbnail, getImageThumbnailUrl, resolveImageUrl } from "@/components/image-thumbnail";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -64,7 +64,7 @@ function LogsContent() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [deletingItems, setDeletingItems] = useState<SystemLog[]>([]);
   const detailUrls = getUrls(detailLog);
-  const detailImages = detailUrls.map((url, index) => ({ id: `${index}`, src: url }));
+  const detailImages = detailUrls.map((url, index) => ({ id: `${index}`, src: resolveImageUrl(url) }));
   const isCallLog = type === LogType.Call;
   const pageSize = 10;
   const pageCount = Math.max(1, Math.ceil(items.length / pageSize));
@@ -305,7 +305,7 @@ function LogsContent() {
                         setLightboxOpen(true);
                       }}
                     >
-                      <img src={url} alt="" className="h-full w-full object-cover" />
+                      <ImageThumbnail src={url} thumbnailSrc={getImageThumbnailUrl(url)} className="h-full w-full" />
                     </button>
                   ))}
                 </div>
