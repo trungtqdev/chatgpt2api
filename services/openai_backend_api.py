@@ -570,7 +570,7 @@ class OpenAIBackendAPI:
             "timezone_offset_min": -480,
             "timezone": "Asia/Shanghai",
             "conversation_mode": {"kind": "primary_assistant"},
-            "enable_message_followups": True,
+            "enable_message_followups": False,
             "system_hints": ["picture_v2"],
             "supports_buffering": True,
             "supported_encodings": ["v1"],
@@ -619,12 +619,16 @@ class OpenAIBackendAPI:
             content = message.get("content") or {}
             if author.get("role") != "tool":
                 continue
-            if metadata.get("async_task_type") != "image_gen":
-                continue
-            if content.get("content_type") != "multimodal_text":
-                continue
+            is_image_tool = (
+                metadata.get("async_task_type") == "image_gen"
+                or "image_gen_title" in metadata
+                or any(isinstance(p, dict) and p.get("notification_channel_id") == "image_gen" for p in (metadata.get("permissions") or []))
+                or content.get("content_type") == "multimodal_text"
+            )
             file_ids, sediment_ids = [], []
             for part in content.get("parts") or []:
+                if isinstance(part, dict) and (part.get("content_type") == "image_asset_pointer" or "asset_pointer" in part or "dalle" in (part.get("metadata") or {})):
+                    is_image_tool = True
                 text = (part.get("asset_pointer") or "") if isinstance(part, dict) else (
                     part if isinstance(part, str) else "")
                 for hit in file_pat.findall(text):
@@ -633,6 +637,8 @@ class OpenAIBackendAPI:
                 for hit in sed_pat.findall(text):
                     if hit not in sediment_ids:
                         sediment_ids.append(hit)
+            if not is_image_tool and not file_ids and not sediment_ids:
+                continue
             records.append(
                 {"message_id": message_id, "create_time": message.get("create_time") or 0, "file_ids": file_ids,
                  "sediment_ids": sediment_ids})

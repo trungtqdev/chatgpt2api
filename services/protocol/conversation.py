@@ -139,19 +139,33 @@ def assistant_history_messages(messages: list[dict[str, Any]]) -> list[str]:
     return [str(item.get("content") or "") for item in messages if item.get("role") == "assistant" and item.get("content")]
 
 
-def build_image_prompt(prompt: str, size: str | None) -> str:
-    if not size:
-        return prompt
-    if size not in {"1:1", "16:9", "9:16", "4:3", "3:4"}:
-        return f"{prompt.strip()}\n\n输出图片，宽高比为 {size}。"
-    hint = {
-        "1:1": "输出为 1:1 正方形构图，主体居中，适合正方形画幅。",
-        "16:9": "输出为 16:9 横屏构图，适合宽画幅展示。",
-        "9:16": "输出为 9:16 竖屏构图，适合竖版画幅展示。",
-        "4:3": "输出为 4:3 比例，兼顾宽度与高度，适合展示画面细节。",
-        "3:4": "输出为 3:4 比例，纵向构图，适合人物肖像或竖向场景。",
-    }[size]
-    return f"{prompt.strip()}\n\n{hint}"
+def build_image_prompt(prompt: str, size: str | None, is_edit: bool = False) -> str:
+    prompt = (prompt or "").strip()
+    size_hint = ""
+    if size:
+        hint_map = {
+            "1:1": "1:1 square",
+            "16:9": "16:9 widescreen",
+            "9:16": "9:16 vertical portrait",
+            "4:3": "4:3 landscape",
+            "3:4": "3:4 portrait",
+        }
+        hint = hint_map.get(size, size)
+        size_hint = f" Aspect ratio: {hint}."
+
+    if is_edit:
+        directive = (
+            "Edit the provided image according to the following instruction. "
+            "You MUST immediately use the image tool to create the modified image. "
+            "Do NOT ask any follow-up questions, do NOT ask for clarification, and do NOT output conversational text:\n\n"
+        )
+    else:
+        directive = (
+            "Generate an image according to the following description. "
+            "You MUST immediately use the image generation tool to create the image. "
+            "Do NOT ask any follow-up questions, do NOT ask for clarification, and do NOT output conversational text:\n\n"
+        )
+    return f"{directive}{prompt}{size_hint}"
 
 
 def encoding_for_model(model: str):
@@ -372,9 +386,22 @@ def is_image_tool_event(event: dict[str, Any]) -> bool:
     message = event.get("message") or (value.get("message") if isinstance(value, dict) else None)
     if not isinstance(message, dict):
         return False
-    metadata = message.get("metadata") or {}
     author = message.get("author") or {}
-    return author.get("role") == "tool" and metadata.get("async_task_type") == "image_gen"
+    if author.get("role") != "tool":
+        return False
+    metadata = message.get("metadata") or {}
+    if metadata.get("async_task_type") == "image_gen" or "image_gen_title" in metadata:
+        return True
+    perms = metadata.get("permissions") or []
+    if any(isinstance(p, dict) and p.get("notification_channel_id") == "image_gen" for p in perms):
+        return True
+    content = message.get("content") or {}
+    if content.get("content_type") == "multimodal_text":
+        return True
+    for part in content.get("parts") or []:
+        if isinstance(part, dict) and (part.get("content_type") == "image_asset_pointer" or "asset_pointer" in part or "dalle" in (part.get("metadata") or {})):
+            return True
+    return False
 
 
 def update_conversation_state(state: ConversationState, payload: str, event: dict[str, Any] | None = None) -> None:
@@ -463,7 +490,7 @@ def conversation_events(
     image_model = str(model or "").strip() in IMAGE_MODELS
     history_text = "" if image_model else assistant_history_text(normalized)
     history_messages = [] if image_model else assistant_history_messages(normalized)
-    final_prompt = prompt_with_global_system(build_image_prompt(prompt, size)) if image_model else prompt
+    final_prompt = prompt_with_global_system(build_image_prompt(prompt, size, is_edit=bool(images))) if image_model else prompt
     payloads = backend.stream_conversation(
         messages=normalized,
         model=model,
@@ -552,7 +579,7 @@ def stream_image_outputs(
     file_ids = [str(item) for item in last.get("file_ids") or []]
     sediment_ids = [str(item) for item in last.get("sediment_ids") or []]
     message = str(last.get("text") or "").strip()
-    is_text_response = last.get("tool_invoked") is False or last.get("turn_use_case") == "text"
+    is_text_response = (last.get("tool_invoked") is False and last.get("turn_use_case") != "image gen") or last.get("turn_use_case") == "text"
     logger.info({
         "event": "image_stream_resolve_start",
         "conversation_id": conversation_id,
