@@ -165,7 +165,7 @@ class GitStorageBackend(StorageBackend):
         """获取存储后端信息"""
         return {
             "type": "git",
-            "description": "Git 私有仓库存储",
+            "description": "Lưu trữ kho Git riêng tư",
             "repo_url": self._mask_token(self.repo_url),
             "branch": self.branch,
             "file_path": self.file_path,

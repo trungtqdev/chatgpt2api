@@ -153,7 +153,7 @@ class DatabaseStorageBackend(StorageBackend):
         return {
             "type": "database",
             "db_type": db_type,
-            "description": f"数据库存储 ({db_type})",
+            "description": f"Lưu trữ cơ sở dữ liệu ({db_type})",
             "database_url": self._mask_password(self.database_url),
         }
 

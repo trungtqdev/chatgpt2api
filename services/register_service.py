@@ -89,7 +89,7 @@ class RegisterService:
             self._save()
             self._runner = threading.Thread(target=self._run, daemon=True, name="openai-register")
             self._runner.start()
-            self._append_log(f"注册任务启动，模式={self._config['mode']}，线程数={self._config['threads']}", "yellow")
+            self._append_log(f"Bắt đầu nhiệm vụ đăng ký, chế độ={self._config['mode']}, số luồng={self._config['threads']}", "yellow")
             return self.get()
 
     def stop(self) -> dict:
@@ -97,7 +97,7 @@ class RegisterService:
             self._config["enabled"] = False
             self._config["stats"]["updated_at"] = _now()
             self._save()
-            self._append_log("已请求停止注册任务，正在等待当前运行任务结束", "yellow")
+            self._append_log("Đã yêu cầu dừng nhiệm vụ đăng ký, đang chờ các tác vụ đang chạy kết thúc", "yellow")
             return self.get()
 
     def reset(self) -> dict:
@@ -116,7 +116,7 @@ class RegisterService:
 
     def _pool_metrics(self) -> dict:
         items = account_service.list_accounts()
-        normal = [item for item in items if item.get("status") == "正常"]
+        normal = [item for item in items if item.get("status") in {"正常", "Bình thường"}]
         return {
             "current_quota": sum(int(item.get("quota") or 0) for item in normal if not item.get("image_quota_unknown")),
             "current_available": len(normal),
@@ -128,11 +128,11 @@ class RegisterService:
         self._bump(**metrics)
         if mode == "quota":
             reached = metrics["current_quota"] >= int(cfg.get("target_quota") or 1)
-            self._append_log(f"检查号池：当前正常账号={metrics['current_available']}，当前剩余额度={metrics['current_quota']}，目标额度={cfg.get('target_quota')}，{'跳过注册' if reached else '继续注册'}", "yellow")
+            self._append_log(f"Kiểm tra kho tài khoản: tài khoản hoạt động={metrics['current_available']}, hạn mức còn lại={metrics['current_quota']}, hạn mức mục tiêu={cfg.get('target_quota')}, {'bỏ qua đăng ký' if reached else 'tiếp tục đăng ký'}", "yellow")
             return reached
         if mode == "available":
             reached = metrics["current_available"] >= int(cfg.get("target_available") or 1)
-            self._append_log(f"检查号池：当前正常账号={metrics['current_available']}，目标账号={cfg.get('target_available')}，当前剩余额度={metrics['current_quota']}，{'跳过注册' if reached else '继续注册'}", "yellow")
+            self._append_log(f"Kiểm tra kho tài khoản: tài khoản hoạt động={metrics['current_available']}, mục tiêu tài khoản={cfg.get('target_available')}, hạn mức còn lại={metrics['current_quota']}, {'bỏ qua đăng ký' if reached else 'tiếp tục đăng ký'}", "yellow")
             return reached
         return submitted >= int(cfg.get("total") or 1)
 
@@ -184,7 +184,7 @@ class RegisterService:
         with self._lock:
             self._config["enabled"] = False
             self._save()
-        self._append_log(f"注册任务结束，成功{success}，失败{fail}", "yellow")
+        self._append_log(f"Nhiệm vụ đăng ký kết thúc, thành công {success}, thất bại {fail}", "yellow")
 
 
 register_service = RegisterService(REGISTER_FILE)

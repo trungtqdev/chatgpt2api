@@ -58,7 +58,7 @@ async def filter_or_log(call: LoggedCall, text: str) -> None:
     try:
         await run_in_threadpool(check_request, text)
     except HTTPException as exc:
-        call.log("调用失败", status="failed", error=str(exc.detail))
+        call.log("Gọi thất bại", status="failed", error=str(exc.detail))
         raise
 
 
@@ -82,7 +82,7 @@ def create_router() -> APIRouter:
         identity = require_identity(authorization)
         payload = body.model_dump(mode="python")
         payload["base_url"] = resolve_image_base_url(request)
-        call = LoggedCall(identity, "/v1/images/generations", body.model, "文生图", request_text=body.prompt)
+        call = LoggedCall(identity, "/v1/images/generations", body.model, "Tạo ảnh từ văn bản", request_text=body.prompt)
         await filter_or_log(call, body.prompt)
         return await call.run(openai_v1_image_generations.handle, payload)
 
@@ -100,7 +100,7 @@ def create_router() -> APIRouter:
             stream: bool | None = Form(default=None),
     ):
         identity = require_identity(authorization)
-        call = LoggedCall(identity, "/v1/images/edits", model, "图生图", request_text=prompt)
+        call = LoggedCall(identity, "/v1/images/edits", model, "Chỉnh sửa ảnh", request_text=prompt)
         if n < 1 or n > 4:
             raise HTTPException(status_code=400, detail={"error": "n must be between 1 and 4"})
         await filter_or_log(call, prompt)
@@ -131,7 +131,7 @@ def create_router() -> APIRouter:
         payload = body.model_dump(mode="python")
         model = str(payload.get("model") or "auto")
         request_preview = request_text(payload.get("prompt"), payload.get("messages"))
-        call = LoggedCall(identity, "/v1/chat/completions", model, "文本生成", request_text=request_preview)
+        call = LoggedCall(identity, "/v1/chat/completions", model, "Tạo văn bản", request_text=request_preview)
         await filter_or_log(call, request_preview)
         return await call.run(openai_v1_chat_complete.handle, payload)
 

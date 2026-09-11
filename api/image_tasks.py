@@ -25,7 +25,7 @@ async def filter_or_log(call: LoggedCall, text: str) -> None:
     try:
         await run_in_threadpool(check_request, text)
     except HTTPException as exc:
-        call.log("调用失败", status="failed", error=str(exc.detail))
+        call.log("Gọi thất bại", status="failed", error=str(exc.detail))
         raise
 
 
@@ -47,7 +47,7 @@ def create_router() -> APIRouter:
         authorization: str | None = Header(default=None),
     ):
         identity = require_identity(authorization)
-        await filter_or_log(LoggedCall(identity, "/api/image-tasks/generations", body.model, "文生图任务", request_text=body.prompt), body.prompt)
+        await filter_or_log(LoggedCall(identity, "/api/image-tasks/generations", body.model, "Nhiệm vụ tạo ảnh từ văn bản", request_text=body.prompt), body.prompt)
         try:
             return await run_in_threadpool(
                 image_task_service.submit_generation,
@@ -73,7 +73,7 @@ def create_router() -> APIRouter:
         size: str | None = Form(default=None),
     ):
         identity = require_identity(authorization)
-        await filter_or_log(LoggedCall(identity, "/api/image-tasks/edits", model, "图生图任务", request_text=prompt), prompt)
+        await filter_or_log(LoggedCall(identity, "/api/image-tasks/edits", model, "Nhiệm vụ chỉnh sửa ảnh", request_text=prompt), prompt)
         uploads = [*(image or []), *(image_list or [])]
         if not uploads:
             raise HTTPException(status_code=400, detail={"error": "image file is required"})

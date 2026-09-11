@@ -6,6 +6,7 @@ services:
     image: chatgpt2api:latest
     container_name: chatgpt2api
     restart: unless-stopped
+    shm_size: '256mb'
     ports:
       - "127.0.0.1:3300:80"
     volumes:

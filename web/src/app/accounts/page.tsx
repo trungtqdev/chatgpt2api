@@ -55,23 +55,28 @@ import { AccountImportDialog } from "./components/account-import-dialog";
 
 const accountStatusOptions: { label: string; value: AccountStatus | "all" }[] = [
   { label: "Tất cả trạng thái", value: "all" },
-  { label: "Bình thường", value: "正常" },
-  { label: "Bị giới hạn", value: "限流" },
-  { label: "Bất thường", value: "异常" },
-  { label: "Vô hiệu hóa", value: "禁用" },
+  { label: "Bình thường", value: "Bình thường" },
+  { label: "Bị giới hạn", value: "Bị giới hạn" },
+  { label: "Bất thường", value: "Bất thường" },
+  { label: "Vô hiệu hóa", value: "Vô hiệu hóa" },
 ];
 
 const statusMeta: Record<
-  AccountStatus,
+  string,
   {
+    label: string;
     icon: typeof CheckCircle2;
     badge: ComponentProps<typeof Badge>["variant"];
   }
 > = {
-  正常: { icon: CheckCircle2, badge: "success" },
-  限流: { icon: CircleAlert, badge: "warning" },
-  异常: { icon: CircleOff, badge: "danger" },
-  禁用: { icon: Ban, badge: "secondary" },
+  正常: { label: "Bình thường", icon: CheckCircle2, badge: "success" },
+  限流: { label: "Bị giới hạn", icon: CircleAlert, badge: "warning" },
+  异常: { label: "Bất thường", icon: CircleOff, badge: "danger" },
+  禁用: { label: "Vô hiệu hóa", icon: Ban, badge: "secondary" },
+  "Bình thường": { label: "Bình thường", icon: CheckCircle2, badge: "success" },
+  "Bị giới hạn": { label: "Bị giới hạn", icon: CircleAlert, badge: "warning" },
+  "Bất thường": { label: "Bất thường", icon: CircleOff, badge: "danger" },
+  "Vô hiệu hóa": { label: "Vô hiệu hóa", icon: Ban, badge: "secondary" },
 };
 
 const metricCards = [
@@ -133,7 +138,9 @@ function formatRestoreAt(value?: string | null) {
 }
 
 function formatQuotaSummary(accounts: Account[]) {
-  const availableAccounts = accounts.filter((account) => account.status === "正常");
+  const availableAccounts = accounts.filter(
+    (account) => account.status === "正常" || account.status === "Bình thường",
+  );
   if (availableAccounts.some(isUnlimitedImageQuotaAccount)) {
     return "∞";
   }
@@ -174,7 +181,7 @@ function AccountsPageContent() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState("10");
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
-  const [editStatus, setEditStatus] = useState<AccountStatus>("正常");
+  const [editStatus, setEditStatus] = useState<AccountStatus>("Bình thường");
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -212,7 +219,13 @@ function AccountsPageContent() {
       const searchMatched =
         normalizedQuery.length === 0 || (account.email ?? "").toLowerCase().includes(normalizedQuery);
       const typeMatched = typeFilter === "all" || displayAccountType(account) === typeFilter;
-      const statusMatched = statusFilter === "all" || account.status === statusFilter;
+      const statusMatched =
+        statusFilter === "all" ||
+        account.status === statusFilter ||
+        ((statusFilter === "Bình thường" || statusFilter === "正常") && (account.status === "Bình thường" || account.status === "正常")) ||
+        ((statusFilter === "Bị giới hạn" || statusFilter === "限流") && (account.status === "Bị giới hạn" || account.status === "限流")) ||
+        ((statusFilter === "Bất thường" || statusFilter === "异常") && (account.status === "Bất thường" || account.status === "异常")) ||
+        ((statusFilter === "Vô hiệu hóa" || statusFilter === "禁用") && (account.status === "Vô hiệu hóa" || account.status === "禁用"));
       return searchMatched && typeMatched && statusMatched;
     });
   }, [accounts, query, statusFilter, typeFilter]);
@@ -226,10 +239,10 @@ function AccountsPageContent() {
 
   const summary = useMemo(() => {
     const total = accounts.length;
-    const active = accounts.filter((item) => item.status === "正常").length;
-    const limited = accounts.filter((item) => item.status === "限流").length;
-    const abnormal = accounts.filter((item) => item.status === "异常").length;
-    const disabled = accounts.filter((item) => item.status === "禁用").length;
+    const active = accounts.filter((item) => item.status === "正常" || item.status === "Bình thường").length;
+    const limited = accounts.filter((item) => item.status === "限流" || item.status === "Bị giới hạn").length;
+    const abnormal = accounts.filter((item) => item.status === "异常" || item.status === "Bất thường").length;
+    const disabled = accounts.filter((item) => item.status === "禁用" || item.status === "Vô hiệu hóa").length;
     const quota = formatQuotaSummary(accounts);
 
     return { total, active, limited, abnormal, disabled, quota };
@@ -249,7 +262,7 @@ function AccountsPageContent() {
   }, [accounts, selectedIds]);
 
   const abnormalTokens = useMemo(() => {
-    return accounts.filter((item) => item.status === "异常").map((item) => item.access_token);
+    return accounts.filter((item) => item.status === "异常" || item.status === "Bất thường").map((item) => item.access_token);
   }, [accounts]);
 
   const paginationItems = useMemo(() => {
@@ -315,7 +328,17 @@ function AccountsPageContent() {
 
   const openEditDialog = (account: Account) => {
     setEditingAccount(account);
-    setEditStatus(account.status);
+    const normalized: AccountStatus =
+      account.status === "正常" || account.status === "Bình thường"
+        ? "Bình thường"
+        : account.status === "限流" || account.status === "Bị giới hạn"
+        ? "Bị giới hạn"
+        : account.status === "异常" || account.status === "Bất thường"
+        ? "Bất thường"
+        : account.status === "禁用" || account.status === "Vô hiệu hóa"
+        ? "Vô hiệu hóa"
+        : (account.status as AccountStatus);
+    setEditStatus(normalized);
   };
 
   const handleUpdateAccount = async () => {
@@ -611,7 +634,11 @@ function AccountsPageContent() {
                 </thead>
                 <tbody>
                   {currentRows.map((account) => {
-                    const status = statusMeta[account.status];
+                    const status = statusMeta[account.status] || {
+                      label: account.status,
+                      icon: CircleAlert,
+                      badge: "secondary" as const,
+                    };
                     const StatusIcon = status.icon;
 
                     return (
@@ -659,7 +686,7 @@ function AccountsPageContent() {
                             className="inline-flex items-center gap-1 rounded-md px-2 py-1"
                           >
                             <StatusIcon className="size-3.5" />
-                            {account.status}
+                            {status.label}
                           </Badge>
                         </td>
                         <td className="px-4 py-3">

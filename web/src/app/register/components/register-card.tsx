@@ -54,6 +54,7 @@ export function RegisterCard() {
       ...(type === "duckmail" ? { api_key: "", default_domain: "duckmail.sbs" } : {}),
       ...(type === "gptmail" ? { api_key: "", default_domain: "" } : {}),
       ...(type === "yyds_mail" ? { api_base: "https://maliapi.215.im/v1", api_key: "", domain: [], subdomain: "", wildcard: false } : {}),
+      ...(type === "etempmail" ? { headless: true, browser_proxy: "", req_proxy: "", max_browser_retries: 3, browser_timeout: 60 } : {}),
     });
   };
 
@@ -173,9 +174,31 @@ export function RegisterCard() {
                             <SelectItem value="duckmail">duckmail</SelectItem>
                             <SelectItem value="gptmail">gptmail (Chưa thử nghiệm)</SelectItem>
                             <SelectItem value="yyds_mail">yyds_mail</SelectItem>
+                            <SelectItem value="etempmail">etempmail (Playwright / Temp Mail)</SelectItem>
+                            <SelectItem value="browser_relay">browser_relay (EtempMail qua Trình duyệt thật)</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
+                      {type === "browser_relay" ? (
+                        <div className="space-y-3 rounded-xl border border-emerald-200 bg-emerald-50/60 p-3.5 text-xs text-stone-700 md:col-span-2">
+                          <div className="flex items-center gap-2 font-semibold text-emerald-800">
+                            <span className="flex size-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Chế độ Browser Relay (Vượt Turnstile bằng Google Chrome thật)
+                          </div>
+                          <p className="leading-relaxed">
+                            Mở một tab <strong>https://etempmail.com</strong> trên máy tính của bạn, nhấn <strong>F12</strong> &rarr; chọn tab <strong>Console</strong> &rarr; dán một trong hai cách bên dưới và bấm Enter:
+                          </p>
+                          <div className="space-y-1.5 font-mono text-[11px]">
+                            <div className="text-stone-500 font-sans font-medium">Lệnh nạp tự động nhanh:</div>
+                            <div className="rounded-lg bg-stone-900 p-2 text-emerald-300 select-all overflow-x-auto">
+                              fetch(location.origin + &apos;/api/register/relay/script&apos;).then(r=&gt;r.text()).then(eval);
+                            </div>
+                          </div>
+                          <p className="text-[11px] text-stone-500">
+                            💡 Sau khi dán, tab etempmail sẽ hiển thị bảng trạng thái màu xanh ở góc phải và tự động gửi email + mã OTP về server.
+                          </p>
+                        </div>
+                      ) : null}
                       {type === "cloudflare_temp_email" || type === "moemail" || type === "inbucket" || type === "yyds_mail" ? (
                         <>
                           <div className="space-y-2">
@@ -217,6 +240,58 @@ export function RegisterCard() {
                           <label className="flex items-center gap-3 pt-8 text-sm text-stone-700">
                             <Checkbox checked={Boolean(provider.wildcard)} onCheckedChange={(checked) => updateProvider(index, { wildcard: Boolean(checked) })} disabled={config.enabled} />
                             Wildcard
+                          </label>
+                        </>
+                      ) : null}
+                      {type === "etempmail" ? (
+                        <>
+                          <div className="space-y-2">
+                            <label className="text-sm text-stone-700">Browser Proxy (Residential vượt Turnstile)</label>
+                            <Input
+                              value={String(provider.browser_proxy || "")}
+                              onChange={(event) => updateProvider(index, { browser_proxy: event.target.value })}
+                              placeholder="http://user:pass@host:port hoặc socks5://..."
+                              className="h-10 rounded-xl border-stone-200 bg-white"
+                              disabled={config.enabled}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm text-stone-700">Request Proxy (Poll hộp thư, tuỳ chọn)</label>
+                            <Input
+                              value={String(provider.req_proxy || "")}
+                              onChange={(event) => updateProvider(index, { req_proxy: event.target.value })}
+                              placeholder="Để trống nếu dùng IP máy chủ"
+                              className="h-10 rounded-xl border-stone-200 bg-white"
+                              disabled={config.enabled}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm text-stone-700">Browser Timeout (giây)</label>
+                            <Input
+                              type="number"
+                              value={String(provider.browser_timeout || 60)}
+                              onChange={(event) => updateProvider(index, { browser_timeout: Number(event.target.value) || 60 })}
+                              className="h-10 rounded-xl border-stone-200 bg-white"
+                              disabled={config.enabled}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm text-stone-700">Số lần thử lại</label>
+                            <Input
+                              type="number"
+                              value={String(provider.max_browser_retries || 3)}
+                              onChange={(event) => updateProvider(index, { max_browser_retries: Number(event.target.value) || 3 })}
+                              className="h-10 rounded-xl border-stone-200 bg-white"
+                              disabled={config.enabled}
+                            />
+                          </div>
+                          <label className="flex items-center gap-3 pt-2 text-sm text-stone-700 md:col-span-2">
+                            <Checkbox
+                              checked={Boolean(provider.headless ?? true)}
+                              onCheckedChange={(checked) => updateProvider(index, { headless: Boolean(checked) })}
+                              disabled={config.enabled}
+                            />
+                            Chạy ẩn (Headless / Xvfb virtual screen)
                           </label>
                         </>
                       ) : null}

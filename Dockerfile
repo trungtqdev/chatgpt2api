@@ -34,12 +34,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     gcc \
     openssl \
+    xvfb \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --no-cache-dir uv
 
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev --no-install-project
+
+# Cài Chromium + Firefox cho Playwright (dùng bởi EtempMailProvider)
+# Chromium: headed qua Xvfb (bypass Turnstile tốt nhất khi có residential proxy)
+# Firefox: headless fallback (ít bị Cloudflare detect hơn Chromium headless)
+RUN uv run playwright install chromium firefox --with-deps
 
 COPY main.py ./
 COPY config.json ./

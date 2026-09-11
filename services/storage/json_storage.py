@@ -87,7 +87,7 @@ class JSONStorageBackend(StorageBackend):
         """获取存储后端信息"""
         return {
             "type": "json",
-            "description": "本地 JSON 文件存储",
+            "description": "Lưu trữ tệp JSON cục bộ",
             "file_path": str(self.file_path),
             "file_exists": self.file_path.exists(),
             "auth_keys_file_path": str(self.auth_keys_path),

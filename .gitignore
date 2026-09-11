@@ -27,4 +27,4 @@ docker-compose-local.yml
 *.sqlite3
 
 # Git cache
-git_cache/
+git_cache/scratch/

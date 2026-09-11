@@ -14,6 +14,8 @@ from typing import Any, Callable, TypeVar
 import requests
 from curl_cffi import requests as curl_requests
 
+from services.register.browser_relay import browser_relay
+
 
 ResultT = TypeVar("ResultT")
 domain_lock = Lock()
@@ -43,7 +45,7 @@ def _next_domain(domains: list[str]) -> str:
     global domain_index
     domains = [str(item).strip() for item in domains if str(item).strip()]
     if not domains:
-        raise RuntimeError("mail.domain 不能为空")
+        raise RuntimeError("mail.domain không được để trống")
     if len(domains) == 1:
         return domains[0]
     with domain_lock:
@@ -136,7 +138,7 @@ def _extract_code(message: dict[str, Any]) -> str | None:
     match = re.search(r"background-color:\s*#F3F3F3[^>]*>[\s\S]*?(\d{6})[\s\S]*?</p>", content, re.I)
     if match:
         return match.group(1)
-    match = re.search(r"(?:Verification code|code is|代码为|验证码)[:\s]*(\d{6})", content, re.I)
+    match = re.search(r"(?:Verification code|code is|mã xác thực|ma xac thuc|mã xác nhận|ma xac nhan|代码为|验证码)[:\s]*(\d{6})", content, re.I)
     if match and match.group(1) != "177010":
         return match.group(1)
     for code in re.findall(r">\s*(\d{6})\s*<|(?<![#&])\b(\d{6})\b", content):
@@ -213,7 +215,7 @@ class CloudflareTempMailProvider(BaseMailProvider):
     def _request(self, method: str, path: str, headers: dict | None = None, params: dict | None = None, payload: dict | None = None, expected: tuple[int, ...] = (200,)):
         resp = self.session.request(method.upper(), f"{self.api_base}{path}", headers={"Content-Type": "application/json", "User-Agent": self.conf["user_agent"], **(headers or {})}, params=params, json=payload, timeout=self.conf["request_timeout"], verify=False)
         if resp.status_code not in expected:
-            raise RuntimeError(f"CloudflareTempMail 请求失败: {method} {path}, HTTP {resp.status_code}, body={resp.text[:300]}")
+            raise RuntimeError(f"Yêu cầu CloudflareTempMail thất bại: {method} {path}, HTTP {resp.status_code}, body={resp.text[:300]}")
         return {} if resp.status_code == 204 else resp.json()
 
     def create_mailbox(self, username: str | None = None) -> dict[str, Any]:
@@ -221,7 +223,7 @@ class CloudflareTempMailProvider(BaseMailProvider):
         address = str(data.get("address") or "").strip()
         token = str(data.get("jwt") or "").strip()
         if not address or not token:
-            raise RuntimeError("CloudflareTempMail 缺少 address 或 jwt")
+            raise RuntimeError("CloudflareTempMail thiếu address hoặc jwt")
         return {"provider": self.name, "provider_ref": self.provider_ref, "address": address, "token": token}
 
     def fetch_latest_message(self, mailbox: dict[str, Any]) -> dict[str, Any] | None:
@@ -264,10 +266,10 @@ class TempMailLolProvider(BaseMailProvider):
     def _request(self, method: str, path: str, params: dict | None = None, payload: dict | None = None, expected: tuple[int, ...] = (200,)):
         resp = self.session.request(method.upper(), f"https://api.tempmail.lol/v2{path}", params=params, json=payload, timeout=self.conf["request_timeout"], verify=False)
         if resp.status_code not in expected:
-            raise RuntimeError(f"TempMail.lol 请求失败: {method} {path}, HTTP {resp.status_code}, body={resp.text[:300]}")
+            raise RuntimeError(f"Yêu cầu TempMail.lol thất bại: {method} {path}, HTTP {resp.status_code}, body={resp.text[:300]}")
         data = resp.json()
         if not isinstance(data, dict):
-            raise RuntimeError(f"TempMail.lol {method} {path} 返回结构不是对象")
+            raise RuntimeError(f"TempMail.lol {method} {path} kết quả trả về không phải là đối tượng")
         return data
 
     def create_mailbox(self, username: str | None = None) -> dict[str, Any]:
@@ -283,7 +285,7 @@ class TempMailLolProvider(BaseMailProvider):
         address = str(data.get("address") or "").strip()
         token = str(data.get("token") or "").strip()
         if not address or not token:
-            raise RuntimeError("TempMail.lol 缺少 address 或 token")
+            raise RuntimeError("TempMail.lol thiếu address hoặc token")
         return {"provider": self.name, "provider_ref": self.provider_ref, "address": address, "token": token}
 
     def fetch_latest_message(self, mailbox: dict[str, Any]) -> dict[str, Any] | None:
@@ -315,7 +317,7 @@ class DuckMailProvider(BaseMailProvider):
         headers = {"Authorization": f"Bearer {self.api_key if use_api_key else token}"} if use_api_key or token else {}
         resp = self.session.request(method.upper(), f"https://api.duckmail.sbs{path}", headers=headers, params=params, json=payload, timeout=self.conf["request_timeout"], verify=False)
         if resp.status_code not in expected:
-            raise RuntimeError(f"DuckMail 请求失败: {method} {path}, HTTP {resp.status_code}, body={resp.text[:300]}")
+            raise RuntimeError(f"Yêu cầu DuckMail thất bại: {method} {path}, HTTP {resp.status_code}, body={resp.text[:300]}")
         return {} if resp.status_code == 204 else resp.json()
 
     @staticmethod
@@ -366,7 +368,7 @@ class GptMailProvider(BaseMailProvider):
         query = dict(params or {})
         resp = self.session.request(method.upper(), f"https://mail.chatgpt.org.uk{path}", params=query, json=payload, timeout=self.conf["request_timeout"], verify=False)
         if resp.status_code != 200:
-            raise RuntimeError(f"GPTMail 请求失败: {method} {path}, HTTP {resp.status_code}, body={resp.text[:300]}")
+            raise RuntimeError(f"Yêu cầu GPTMail thất bại: {method} {path}, HTTP {resp.status_code}, body={resp.text[:300]}")
         data = resp.json()
         return data["data"] if isinstance(data, dict) and "data" in data else data
 
@@ -407,10 +409,10 @@ class MoEmailProvider(BaseMailProvider):
     def _request(self, method: str, path: str, params: dict | None = None, payload: dict | None = None, expected: tuple[int, ...] = (200,)):
         resp = self.session.request(method.upper(), f"{self.api_base}{path}", headers={"X-API-Key": self.api_key, "Content-Type": "application/json", "User-Agent": self.conf["user_agent"]}, params=params, json=payload, timeout=self.conf["request_timeout"], verify=False)
         if resp.status_code not in expected:
-            raise RuntimeError(f"MoEmail 请求失败: {method} {path}, HTTP {resp.status_code}, body={resp.text[:300]}")
+            raise RuntimeError(f"Yêu cầu MoEmail thất bại: {method} {path}, HTTP {resp.status_code}, body={resp.text[:300]}")
         data = resp.json()
         if not isinstance(data, dict):
-            raise RuntimeError(f"MoEmail {method} {path} 返回结构不是对象")
+            raise RuntimeError(f"MoEmail {method} {path} kết quả trả về không phải là đối tượng")
         return data
 
     def create_mailbox(self, username: str | None = None) -> dict[str, Any]:
@@ -418,13 +420,13 @@ class MoEmailProvider(BaseMailProvider):
         address = str(data.get("email") or "").strip()
         email_id = str(data.get("id") or data.get("email_id") or "").strip()
         if not address or not email_id:
-            raise RuntimeError("MoEmail 缺少 email 或 id")
+            raise RuntimeError("MoEmail thiếu email hoặc id")
         return {"provider": self.name, "provider_ref": self.provider_ref, "address": address, "email_id": email_id}
 
     def fetch_latest_message(self, mailbox: dict[str, Any]) -> dict[str, Any] | None:
         email_id = str(mailbox.get("email_id") or "").strip()
         if not email_id:
-            raise RuntimeError("MoEmail 缺少 email_id")
+            raise RuntimeError("MoEmail thiếu email_id")
         data = self._request("GET", f"/api/emails/{email_id}")
         items = data.get("messages") or []
         messages = [item for item in items if isinstance(item, dict)] if isinstance(items, list) else []
@@ -471,7 +473,7 @@ class InbucketMailProvider(BaseMailProvider):
             verify=False,
         )
         if resp.status_code not in expected:
-            raise RuntimeError(f"Inbucket 请求失败: {method} {path}, HTTP {resp.status_code}, body={resp.text[:300]}")
+            raise RuntimeError(f"Yêu cầu Inbucket thất bại: {method} {path}, HTTP {resp.status_code}, body={resp.text[:300]}")
         if resp.status_code == 204:
             return {}
         content_type = str(resp.headers.get("content-type") or "").lower()
@@ -482,7 +484,7 @@ class InbucketMailProvider(BaseMailProvider):
     def _resolve_domain(self) -> str:
         if self.domain:
             return _next_domain(self.domain)
-        raise RuntimeError("Inbucket 需要至少配置一个 domain")
+        raise RuntimeError("Inbucket cần cấu hình ít nhất một domain")
 
     def _mailbox_name(self, address: str) -> str:
         local_part, _, _ = str(address or "").partition("@")
@@ -505,7 +507,7 @@ class InbucketMailProvider(BaseMailProvider):
     def fetch_latest_message(self, mailbox: dict[str, Any]) -> dict[str, Any] | None:
         mailbox_name = str(mailbox.get("mailbox_name") or self._mailbox_name(str(mailbox.get("address") or ""))).strip()
         if not mailbox_name:
-            raise RuntimeError("Inbucket 缺少 mailbox_name")
+            raise RuntimeError("Inbucket thiếu mailbox_name")
         data = self._request("GET", f"/api/v1/mailbox/{mailbox_name}")
         items = [item for item in data if isinstance(item, dict)] if isinstance(data, list) else []
         if not items:
@@ -565,12 +567,12 @@ class YydsMailProvider(BaseMailProvider):
         headers = {"Authorization": f"Bearer {token}"} if token else {"X-API-Key": self.api_key}
         resp = self.session.request(method.upper(), f"{self.api_base}{path}", headers=headers, params=params, json=payload, timeout=self.conf["request_timeout"], verify=False)
         if resp.status_code not in expected:
-            raise RuntimeError(f"YYDSMail 请求失败: {method} {path}, HTTP {resp.status_code}, body={resp.text[:300]}")
+            raise RuntimeError(f"Yêu cầu YYDSMail thất bại: {method} {path}, HTTP {resp.status_code}, body={resp.text[:300]}")
         if resp.status_code == 204:
             return {}
         data = resp.json()
         if isinstance(data, dict) and data.get("success") is False:
-            raise RuntimeError(f"YYDSMail 请求失败: {data.get('errorCode') or data.get('error')}")
+            raise RuntimeError(f"Yêu cầu YYDSMail thất bại: {data.get('errorCode') or data.get('error')}")
         return data.get("data") if isinstance(data, dict) and isinstance(data.get("data"), (dict, list)) else data
 
     @staticmethod
@@ -587,7 +589,7 @@ class YydsMailProvider(BaseMailProvider):
         address = str(data.get("address") or data.get("email") or "").strip()
         token = str(data.get("token") or data.get("temp_token") or data.get("tempToken") or data.get("access_token") or "").strip()
         if not address or not token:
-            raise RuntimeError("YYDSMail 缺少 address 或 token")
+            raise RuntimeError("YYDSMail thiếu address hoặc token")
         return {"provider": self.name, "provider_ref": self.provider_ref, "address": address, "token": token, "account_id": str(data.get("id") or "")}
 
     def fetch_latest_message(self, mailbox: dict[str, Any]) -> dict[str, Any] | None:
@@ -609,6 +611,426 @@ class YydsMailProvider(BaseMailProvider):
         self.session.close()
 
 
+class EtempMailProvider(BaseMailProvider):
+    """Mail provider dùng Playwright headless browser để vượt Cloudflare Turnstile
+    Invisible trên etempmail.com và lấy địa chỉ email tạm.
+
+    Browser chỉ được khởi động một lần khi ``create_mailbox()``; sau đó tất cả
+    các lần poll inbox đều dùng ``requests`` HTTP thông thường với session cookies
+    đã capture — không tốn thêm overhead browser.
+    """
+
+    name = "etempmail"
+
+    # ── endpoints ──────────────────────────────────────────────────────────────
+    _BASE_URL  = "https://etempmail.com"
+    _EMAIL_URL = "https://etempmail.com/getEmailAddress"
+    _INBOX_URL = "https://etempmail.com/getInbox"
+    _DETAIL_URL = "https://etempmail.com/email"
+    _MORE_URL  = "https://etempmail.com/moreMinutes"
+    _DELETE_URL = "https://etempmail.com/deleteEmailAddress"
+
+    # Địa chỉ troll mà backend etempmail trả về khi không có cf_token hợp lệ
+    _TROLL_MARKER = "ip_logged"
+    _TROLL_DOMAIN = "get-a-real-job.com"
+
+    _DEFAULT_UA = (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/124.0.0.0 Safari/537.36"
+    )
+
+    def __init__(self, entry: dict, conf: dict) -> None:
+        super().__init__(conf, str(entry.get("provider_ref") or ""))
+        self.headless: bool = bool(entry.get("headless", True))
+        # proxy cho Playwright browser (tách biệt proxy của OpenAI)
+        # dạng "socks5://user:pass@host:port" hoặc "http://host:port"
+        self.browser_proxy: str = str(entry.get("browser_proxy") or entry.get("proxy") or "").strip()
+        # proxy cho requests (polling inbox)
+        self.req_proxy: str = str(entry.get("req_proxy") or entry.get("proxy") or "").strip()
+        # số lần thử lại khi nhận địa chỉ troll
+        self.max_browser_retries: int = int(entry.get("max_browser_retries") or 3)
+        # thời gian tối đa (giây) chờ Turnstile giải và nhận địa chỉ email
+        self.browser_timeout: float = float(entry.get("browser_timeout") or 45)
+        # mailbox dict cuối cùng tạo được, dùng cho close() để dọn dẹp
+        self._last_mailbox: dict | None = None
+
+    # ── public API ──────────────────────────────────────────────────────────────
+
+    def create_mailbox(self, username: str | None = None) -> dict[str, Any]:
+        """Mở Chrome headless, để Turnstile Invisible tự giải, intercept
+        phản hồi /getEmailAddress và trả về mailbox dict.
+        """
+        last_error = ""
+        for attempt in range(1, self.max_browser_retries + 1):
+            try:
+                mailbox = self._browser_get_mailbox()
+                self._last_mailbox = mailbox
+                return mailbox
+            except RuntimeError as exc:
+                last_error = str(exc)
+                if attempt < self.max_browser_retries:
+                    time.sleep(2)
+        raise RuntimeError(f"EtempMail: Không thể tạo hộp thư sau {self.max_browser_retries} lần thử. Lỗi cuối: {last_error}")
+
+    def fetch_latest_message(self, mailbox: dict[str, Any]) -> dict[str, Any] | None:
+        """Poll inbox bằng requests HTTP (không cần browser), trả về thư
+        mới nhất từ OpenAI hoặc None nếu chưa có thư.
+        """
+        session = self._make_req_session(mailbox)
+        try:
+            resp = session.post(
+                self._INBOX_URL,
+                headers=self._req_headers(referer=self._BASE_URL + "/"),
+                timeout=self.conf["request_timeout"],
+            )
+            if resp.status_code != 200:
+                return None
+            try:
+                items = resp.json()
+            except Exception:
+                return None
+            if not isinstance(items, list) or not items:
+                return None
+            # Lấy thư mới nhất (etempmail trả về danh sách từ mới đến cũ)
+            item = items[0]
+            if not isinstance(item, dict):
+                return None
+            message_id = str(item.get("id") or "").strip()
+            # Đọc nội dung chi tiết thư qua trang HTML /email?id=N
+            text_content, html_content = self._fetch_message_body(session, message_id)
+            sender_raw = str(item.get("from") or "")
+            # etempmail trả về dạng "Name <addr@domain>" hoặc chỉ địa chỉ
+            sender_match = re.search(r"<([^>]+)>", sender_raw)
+            sender = sender_match.group(1) if sender_match else sender_raw
+            return {
+                "provider": self.name,
+                "mailbox": str(mailbox.get("address") or ""),
+                "message_id": message_id,
+                "subject": str(item.get("subject") or ""),
+                "sender": sender,
+                "text_content": text_content,
+                "html_content": html_content,
+                "received_at": _parse_received_at(item.get("date")),
+                "raw": item,
+            }
+        finally:
+            session.close()
+
+    def extend_mailbox(self, mailbox: dict[str, Any]) -> None:
+        """Gia hạn hộp thư khi cần thêm thời gian (gọi thủ công nếu muốn)."""
+        session = self._make_req_session(mailbox)
+        try:
+            session.post(
+                self._MORE_URL,
+                headers=self._req_headers(referer=self._BASE_URL + "/"),
+                timeout=self.conf["request_timeout"],
+            )
+        finally:
+            session.close()
+
+    def close(self) -> None:
+        """Dọn dẹp: xoá hộp thư trên etempmail sau khi dùng xong."""
+        if self._last_mailbox:
+            self._delete_mailbox(self._last_mailbox)
+            self._last_mailbox = None
+
+    # ── internal: Playwright browser ────────────────────────────────────────────
+
+    def _browser_get_mailbox(self) -> dict[str, Any]:
+        """Dùng Playwright lấy địa chỉ email từ etempmail.com.
+
+        Chiến lược:
+        1. Nếu không có X Display và ``xvfb-run`` khả dụng → chạy Chrome
+           **headed** qua virtual framebuffer (Turnstile pass tốt nhất).
+        2. Fallback: headless Firefox (ít bị detect hơn Chromium headless).
+        3. Fallback cuối: headless Chromium với stealth patches.
+
+        Sau khi Turnstile giải xong, đọc email trực tiếp từ DOM element
+        ``#tempEmailAddress`` — không cần intercept network.
+        """
+        import os
+        import shutil
+
+        try:
+            from playwright.sync_api import sync_playwright, Browser, BrowserContext
+        except ImportError as exc:
+            raise RuntimeError(
+                "EtempMail yêu cầu playwright: chạy 'uv add playwright' và "
+                "'uv run playwright install chromium firefox --with-deps'"
+            ) from exc
+
+        # Quyết định có dùng virtual display không
+        has_display = bool(os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY"))
+        has_xvfb = bool(shutil.which("xvfb-run"))
+        # Dùng headed + xvfb khi: không có màn hình thật, xvfb có, và không bị tắt headless
+        use_xvfb_headed = not has_display and has_xvfb and self.headless
+
+        if use_xvfb_headed:
+            # Khởi động Xvfb virtual display rồi set DISPLAY
+            import subprocess
+            xvfb_display = ":99"
+            xvfb_proc = subprocess.Popen(
+                ["Xvfb", xvfb_display, "-screen", "0", "1280x800x24"],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            )
+            time.sleep(1)  # Chờ Xvfb khởi động
+            os.environ["DISPLAY"] = xvfb_display
+        else:
+            xvfb_proc = None
+
+        try:
+            return self._run_browser_engines(use_xvfb_headed)
+        finally:
+            # Dọn dẹp Xvfb
+            if xvfb_proc is not None:
+                try:
+                    xvfb_proc.terminate()
+                    xvfb_proc.wait(timeout=3)
+                except Exception:
+                    pass
+                try:
+                    del os.environ["DISPLAY"]
+                except KeyError:
+                    pass
+
+    def _run_browser_engines(self, use_headed: bool) -> dict[str, Any]:
+        """Thử từng browser engine cho đến khi lấy được email hợp lệ."""
+        from playwright.sync_api import sync_playwright, Browser, BrowserContext
+
+        with sync_playwright() as p:
+            browser_engines = [
+                ("firefox", p.firefox),
+                ("chromium", p.chromium),
+            ]
+            last_err = ""
+            for engine_name, engine in browser_engines:
+                browser: Browser | None = None
+                try:
+                    # Chromium headed (qua Xvfb) bypass Turnstile tốt nhất
+                    # Firefox headless: ít bị detect hơn Chromium headless
+                    # Chromium headless: fallback cuối
+                    run_headless = not use_headed
+                    launch_kwargs: dict[str, Any] = {"headless": run_headless}
+
+                    if engine_name == "chromium":
+                        launch_kwargs["args"] = [
+                            "--no-sandbox",
+                            "--disable-dev-shm-usage",
+                            "--disable-blink-features=AutomationControlled",
+                            "--disable-web-security",
+                            "--lang=en-US",
+                        ]
+                        if run_headless:
+                            # Headless chromium: thêm SwiftShader để tránh GL errors
+                            launch_kwargs["args"].append("--enable-unsafe-swiftshader")
+
+                    if self.browser_proxy:
+                        from urllib.parse import urlparse
+                        _u = urlparse(self.browser_proxy)
+                        if _u.hostname:
+                            _server = f"{_u.scheme or 'http'}://{_u.hostname}"
+                            if _u.port:
+                                _server += f":{_u.port}"
+                            _proxy_dict: dict[str, str] = {"server": _server}
+                            if _u.username:
+                                _proxy_dict["username"] = _u.username
+                            if _u.password:
+                                _proxy_dict["password"] = _u.password
+                            launch_kwargs["proxy"] = _proxy_dict
+                        else:
+                            launch_kwargs["proxy"] = {"server": self.browser_proxy}
+
+                    browser = engine.launch(**launch_kwargs)
+                    ctx_kwargs: dict[str, Any] = {
+                        "locale": "en-US",
+                        "timezone_id": "America/New_York",
+                        "user_agent": self._DEFAULT_UA,
+                        "viewport": {"width": 1280, "height": 800},
+                        "java_script_enabled": True,
+                    }
+                    context: BrowserContext = browser.new_context(**ctx_kwargs)
+
+                    # Stealth script — ẩn dấu hiệu automation
+                    context.add_init_script("""
+                        Object.defineProperty(navigator, 'webdriver', { get: () => false });
+                        Object.defineProperty(navigator, 'plugins', {
+                            get: () => { const p = []; p.length = 3; return p; }
+                        });
+                        Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'] });
+                        window.chrome = { runtime: {} };
+                    """)
+
+                    page = context.new_page()
+
+                    # "domcontentloaded" không bị block bởi Cloudflare background polling
+                    page.goto(
+                        self._BASE_URL,
+                        wait_until="domcontentloaded",
+                        timeout=int(self.browser_timeout * 1000),
+                    )
+
+                    # Chờ Turnstile giải xong → JS điền email thật vào #tempEmailAddress
+                    # Nhận biết email thật bằng ký tự "@" (phân biệt với "Please wait...")
+                    page.wait_for_function(
+                        """() => {
+                            const el = document.getElementById('tempEmailAddress');
+                            return el && el.value && el.value.includes('@');
+                        }""",
+                        timeout=int(self.browser_timeout * 1000),
+                    )
+
+                    # Đọc giá trị từ DOM
+                    address = (page.input_value("#tempEmailAddress") or "").strip()
+                    recover_key = (page.text_content("#recoverKey") or "").strip()
+
+                    # Phát hiện địa chỉ troll (Turnstile fail nhưng server vẫn trả về giá trị)
+                    if not address or self._TROLL_MARKER in address or self._TROLL_DOMAIN in address:
+                        raise RuntimeError(
+                            f"EtempMail [{engine_name}]: Địa chỉ không hợp lệ: '{address}'"
+                        )
+
+                    # Capture cookies
+                    raw_cookies = context.cookies()
+                    cookies: dict[str, str] = {
+                        c["name"]: c["value"]
+                        for c in raw_cookies
+                        if "etempmail" in str(c.get("domain") or "")
+                    }
+
+                    browser.close()
+                    browser = None
+                    return {
+                        "provider": self.name,
+                        "provider_ref": self.provider_ref,
+                        "address": address,
+                        "recover_key": recover_key,
+                        "creation_time": "",
+                        "cookies": cookies,
+                        "_engine": engine_name,
+                        "_headed": use_headed,
+                    }
+
+                except Exception as exc:
+                    if browser:
+                        try:
+                            browser.close()
+                        except Exception:
+                            pass
+                        browser = None
+                    last_err = str(exc)
+                    _skip_keywords = (
+                        "timeout", "timeouter", "không hợp lệ",
+                        "executable", "browser", "crashed", "disconnected",
+                    )
+                    if any(kw in last_err.lower() for kw in _skip_keywords):
+                        continue
+                    raise
+
+            raise RuntimeError(
+                f"EtempMail: Không thể vượt Cloudflare Turnstile bằng cả Firefox lẫn Chromium. "
+                f"Lỗi cuối: {last_err}. "
+                f"Giải pháp: dùng residential proxy hoặc captcha solver service."
+            )
+
+    # ── internal: requests HTTP helpers ─────────────────────────────────────────
+
+    def _make_req_session(self, mailbox: dict[str, Any]) -> requests.Session:
+        """Tạo requests.Session với cookies và proxy đã cấu hình."""
+        session = requests.Session()
+        session.trust_env = False
+        cookies: dict = mailbox.get("cookies") or {}
+        for name, value in cookies.items():
+            session.cookies.set(name, value, domain="etempmail.com")
+        if self.req_proxy:
+            session.proxies.update({"http": self.req_proxy, "https": self.req_proxy})
+        session.verify = False
+        return session
+
+    def _req_headers(self, referer: str = "") -> dict[str, str]:
+        headers: dict[str, str] = {
+            "User-Agent": self.conf.get("user_agent") or self._DEFAULT_UA,
+            "Accept": "application/json, text/javascript, */*; q=0.01",
+            "Accept-Language": "en-US,en;q=0.9",
+            "X-Requested-With": "XMLHttpRequest",
+            "Origin": self._BASE_URL,
+        }
+        if referer:
+            headers["Referer"] = referer
+        return headers
+
+    def _fetch_message_body(self, session: requests.Session, message_id: str) -> tuple[str, str]:
+        """Lấy nội dung HTML của thư qua trang /email?id=N, trích xuất text/html."""
+        if not message_id:
+            return "", ""
+        try:
+            resp = session.get(
+                self._DETAIL_URL,
+                params={"id": message_id},
+                headers={
+                    "User-Agent": self.conf.get("user_agent") or self._DEFAULT_UA,
+                    "Accept": "text/html,application/xhtml+xml",
+                    "Referer": self._BASE_URL + "/",
+                },
+                timeout=self.conf["request_timeout"],
+            )
+            if resp.status_code != 200:
+                return "", ""
+            html = resp.text or ""
+            # Cố gắng trích xuất phần body thư từ trang HTML của etempmail
+            # etempmail bọc nội dung thư trong <div class="card-body">
+            body_match = re.search(
+                r'<div[^>]+class=["\'][^"\']*card-body[^"\']*["\'][^>]*>([\s\S]*?)</div>',
+                html,
+                re.I,
+            )
+            html_content = body_match.group(1).strip() if body_match else html
+            text_content = re.sub(r"<[^>]+>", " ", html_content)
+            text_content = re.sub(r"\s+", " ", text_content).strip()
+            return text_content, html_content
+        except Exception:
+            return "", ""
+
+    def _delete_mailbox(self, mailbox: dict[str, Any]) -> None:
+        """Xoá hộp thư trên etempmail sau khi không còn cần dùng nữa."""
+        session = self._make_req_session(mailbox)
+        try:
+            session.post(
+                self._DELETE_URL,
+                headers=self._req_headers(referer=self._BASE_URL + "/"),
+                timeout=max(5.0, self.conf["request_timeout"]),
+            )
+        except Exception:
+            pass
+        finally:
+            session.close()
+
+
+class BrowserRelayMailProvider(BaseMailProvider):
+    name = "browser_relay"
+
+    def __init__(self, entry: dict, conf: dict):
+        super().__init__(conf, str(entry.get("provider_ref") or ""))
+        self._last_mailbox: dict[str, Any] | None = None
+
+    def create_mailbox(self, username: str | None = None) -> dict[str, Any]:
+        timeout = float(self.conf.get("wait_timeout") or 60)
+        mailbox = browser_relay.server_wait_for_mailbox(timeout=timeout)
+        mailbox["provider_ref"] = self.provider_ref
+        self._last_mailbox = mailbox
+        return mailbox
+
+    def fetch_latest_message(self, mailbox: dict[str, Any]) -> dict[str, Any] | None:
+        return None
+
+    def wait_for_code(self, mailbox: dict[str, Any]) -> str | None:
+        timeout = float(self.conf.get("wait_timeout") or 60)
+        return browser_relay.server_wait_for_otp(mailbox, timeout=timeout)
+
+    def close(self) -> None:
+        browser_relay.server_mailbox_done(self._last_mailbox, success=True)
+
+
 def _entries(mail_config: dict) -> list[dict]:
     return [{**item, "provider_ref": f"{item['type']}#{index + 1}"} for index, item in enumerate(mail_config["providers"])]
 
@@ -616,7 +1038,7 @@ def _entries(mail_config: dict) -> list[dict]:
 def _enabled_entries(mail_config: dict) -> list[dict]:
     items = [item for item in _entries(mail_config) if item.get("enable")]
     if not items:
-        raise RuntimeError("mail.providers 没有启用的 provider")
+        raise RuntimeError("mail.providers không có nhà cung cấp nào được kích hoạt")
     return items
 
 
@@ -649,11 +1071,21 @@ def _create_provider(mail_config: dict, provider: str = "", provider_ref: str = 
         return InbucketMailProvider(entry, conf)
     if entry["type"] == "yyds_mail":
         return YydsMailProvider(entry, conf)
-    raise RuntimeError(f"不支持的 mail.provider: {entry['type']}")
+    if entry["type"] == "etempmail":
+        return EtempMailProvider(entry, conf)
+    if entry["type"] == "browser_relay":
+        return BrowserRelayMailProvider(entry, conf)
+    raise RuntimeError(f"Không hỗ trợ mail.provider: {entry['type']}")
 
 
 def create_mailbox(mail_config: dict, username: str | None = None) -> dict:
     provider = _create_provider(mail_config)
+    # EtempMailProvider và BrowserRelayMailProvider: KHÔNG gọi close() ngay sau khi tạo hộp thư
+    # vì close() sẽ kích hoạt đổi/xóa mail — hộp thư cần tồn tại để nhận OTP.
+    if isinstance(provider, (EtempMailProvider, BrowserRelayMailProvider)):
+        mailbox = provider.create_mailbox(username)
+        mailbox["_provider_instance"] = provider
+        return mailbox
     try:
         return provider.create_mailbox(username)
     finally:
@@ -661,7 +1093,8 @@ def create_mailbox(mail_config: dict, username: str | None = None) -> dict:
 
 
 def wait_for_code(mail_config: dict, mailbox: dict) -> str | None:
-    provider = _create_provider(mail_config, str(mailbox.get("provider") or ""), str(mailbox.get("provider_ref") or ""))
+    bound_provider: BaseMailProvider | None = mailbox.pop("_provider_instance", None)
+    provider = bound_provider or _create_provider(mail_config, str(mailbox.get("provider") or ""), str(mailbox.get("provider_ref") or ""))
     try:
         return provider.wait_for_code(mailbox)
     finally:
